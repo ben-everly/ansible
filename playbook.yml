@@ -1,0 +1,116 @@
+---
+- hosts: all
+  vars:
+      home: "{{ lookup('env', 'HOME') }}"
+      docker_compose_path: "/usr/local/bin/docker-compose"
+      docker_compose_version: 1.25.4
+  tasks:
+      - name: apt installs for debian 10
+        become: yes
+        block:
+            - name: upgrade dist
+              apt:
+                  upgrade: dist
+                  update_cache: yes
+
+            - name: add docker signing key
+              apt_key:
+                  url: https://download.docker.com/linux/debian/gpg
+                  state: present
+
+                  # thoughtbot key
+                  # https://apt.thoughtbot.com/thoughtbot.gpg.key
+
+            - name: add thoughbot repository
+              apt_repository:
+                  repo: deb https://apt.thoughtbot.com/debian/ stable main
+                  state: present
+                  filename: thoughtbot
+
+            - name: add docker repository
+              apt_repository:
+                  repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+                  state: present
+                  filename: docker
+
+            - name: Install apt packages
+              apt:
+                  name:
+                      - bash
+                      - curl
+                      - docker-ce
+                      - docker-ce-cli
+                      - fonts-firacode
+                      - git
+                      - grep
+                      - kitty
+                      - less
+                      - neovim
+                      - nodejs
+                      - php
+                      - php-cli
+                      - php-curl
+                      - php-mbstring
+                      - python-pip
+                      - python2
+                      - python3
+                      - python3-apt
+                      - python3-neovim
+                      - python3-pip
+                      - rcm
+                      - ruby-full
+                      - sed
+                      - silversearcher-ag
+                      - tmux
+                      - unzip
+                      - vim
+                      - zsh
+                  state: present
+                  update_cache: yes
+
+            - name: apt cleanup
+              apt:
+                  autoclean: yes
+                  autoremove: yes
+
+      - name: install pip packages
+        pip: 
+            name: pynvim
+
+      - name: install ruby packages
+        gem:
+            name: neovim
+
+      - name: install npm packages
+        npm:
+            name: neovim
+            global: yes
+
+      - name: install docker-compose
+        block:
+            - name: Check current docker-compose version.
+              command: docker-compose --version
+              register: docker_compose_current_version
+              changed_when: false
+              failed_when: false
+
+            - name: Delete existing docker-compose version if it's different.
+              become: yes
+              file:
+                  path: "{{ docker_compose_path }}"
+                  state: absent
+              when: >
+                  docker_compose_current_version.stdout is defined
+                  and docker_compose_version not in docker_compose_current_version.stdout
+
+            - name: Install Docker Compose (if configured).
+              become: yes
+              get_url:
+                  url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+                  dest: "{{ docker_compose_path }}"
+                  mode: 0755
+
+      - name: dotfiles
+        git:
+            repo: "git@github.com:ben-everly/dotfiles"
+            dest: "{{ home }}/.dotfiles"
