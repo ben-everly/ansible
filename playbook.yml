@@ -36,6 +36,7 @@
             - name: Install apt packages
               apt:
                   name:
+                      - automake
                       - bash
                       - curl
                       - docker-ce
@@ -47,6 +48,7 @@
                       - less
                       - neovim
                       - nodejs
+                      - pkg-config
                       - php
                       - php-cli
                       - php-curl
@@ -114,3 +116,21 @@
         git:
             repo: "git@github.com:ben-everly/dotfiles"
             dest: "{{ home }}/.dotfiles"
+
+      - name: install universal ctags
+        block:
+            - name: get ctags repo
+              git:
+                  repo: "git@github.com:universal-ctags/ctags"
+                  dest: "./tmp/ctags"
+
+            - name: make ctags
+              shell: ./autogen.sh && ./configure && make
+              args:
+                  chdir: ./tmp/ctags
+
+            - name: install ctags
+              make:
+                  chdir: ./tmp/ctags
+                  target: install
+              become: yes
