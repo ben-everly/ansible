@@ -72,7 +72,6 @@
 
             - name: apt cleanup
               apt:
-                  autoclean: yes
                   autoremove: yes
 
       - name: install pip packages
