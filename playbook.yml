@@ -13,21 +13,21 @@
                   upgrade: dist
                   update_cache: yes
 
+                  # thoughtbot key
+                  # https://apt.thoughtbot.com/thoughtbot.gpg.key
+
             - name: add docker signing key
               apt_key:
                   url: https://download.docker.com/linux/debian/gpg
                   state: present
 
-                  # thoughtbot key
-                  # https://apt.thoughtbot.com/thoughtbot.gpg.key
-
-            - name: add thoughbot repository
+            - name: add thoughbot apt repository
               apt_repository:
                   repo: deb https://apt.thoughtbot.com/debian/ stable main
                   state: present
                   filename: thoughtbot
 
-            - name: add docker repository
+            - name: add docker apt repository
               apt_repository:
                   repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
                   state: present
