@@ -123,14 +123,17 @@
               git:
                   repo: "git@github.com:universal-ctags/ctags"
                   dest: "./tmp/ctags"
+              register: ctags
 
             - name: make ctags
               shell: ./autogen.sh && ./configure && make
               args:
                   chdir: ./tmp/ctags
+              when: ctags.changed
 
             - name: install ctags
               make:
                   chdir: ./tmp/ctags
                   target: install
               become: yes
+              when: ctags.changed
