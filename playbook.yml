@@ -113,9 +113,16 @@
                   mode: 0755
 
       - name: dotfiles
-        git:
-            repo: "git@github.com:ben-everly/dotfiles"
-            dest: "{{ home }}/.dotfiles"
+        block:
+          - name: clone dotfiles repo
+            git:
+              repo: "git@github.com:ben-everly/dotfiles"
+              dest: "{{ home }}/.dotfiles"
+            register: dotfiles
+
+          - name: update dotfiles
+            shell: rcup
+            when: dotfiles.changed
 
       - name: install universal ctags
         block:
