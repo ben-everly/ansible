@@ -145,3 +145,32 @@
               target: install
             become: yes
             when: ctags.changed
+
+      - name: install gh cli tool
+        block:
+          - name: find latest release of gh cli
+            uri:
+              url: https://api.github.com/repos/cli/cli/releases/latest
+            register: download
+
+          - set_fact:
+              asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
+          - set_fact:
+              filename: "./tmp/{{ asset.name }}"
+              url: "{{ asset.browser_download_url }}"
+
+          - name: check if latest version of gh cli is already downloaded
+            stat:
+              path: "{{ filename }}"
+            register: version
+
+          - name: download latest version of gh cli
+            get_url:
+              url: "{{ url }}"
+              dest: "{{ filename }}"
+            when: not version.stat.exists
+
+          - name: install latest version of gh cli
+            apt: deb="{{ filename }}"
+            become: yes
+            when: not version.stat.exists
