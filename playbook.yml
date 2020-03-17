@@ -174,3 +174,35 @@
             apt: deb="{{ filename }}"
             become: yes
             when: not version.stat.exists
+
+      - name: install dbxcli tool
+        block:
+          - name: find latest release of dbxcli
+            uri:
+              url: https://api.github.com/repos/dropbox/dbxcli/releases/latest
+            register: download
+
+          - set_fact:
+              asset: "{{ download.json.assets | select('match', '.*linux-amd64') | first }}"
+          - set_fact:
+              filename: "./tmp/{{ download.json.name}}-{{ asset.name }}"
+              url: "{{ asset.browser_download_url }}"
+
+          - name: check if latest version of dbxcli is already downloaded
+            stat:
+              path: "{{ filename }}"
+            register: version
+
+          - name: download latest version of dbxcli
+            get_url:
+              url: "{{ url }}"
+              dest: "{{ filename }}"
+            when: not version.stat.exists
+
+          - name: copy executable into path
+            copy:
+              src: "{{ filename }}"
+              dest: /usr/local/bin/dbxcli
+              mode: '0755'
+            become: yes
+            when: not version.stat.exists
