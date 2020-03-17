@@ -113,6 +113,23 @@
               dest: "{{ docker_compose_path }}"
               mode: 0755
 
+          - name: create docker group
+            group:
+              name: docker
+              state: present
+
+          - name: get username
+            local_action: command whoami
+            changed_when: false
+            register: username
+
+          - name: add user to docker group
+            user:
+              name: "{{ username.stdout }}"
+              groups: docker
+              append: yes
+            become: yes
+
       - name: dotfiles
         block:
           - name: clone dotfiles repo
