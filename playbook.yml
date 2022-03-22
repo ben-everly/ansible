@@ -69,17 +69,20 @@
       - name: install pip packages
         pip: 
           name: pynvim
+          state: latest
 
       - name: install ruby packages
         become: yes
         gem:
           name: neovim
+          state: latest
 
       - name: install npm packages
         become: yes
         npm:
           name: neovim
           global: yes
+          state: latest
 
       - name: dotfiles
         block:
