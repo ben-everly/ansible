@@ -2,8 +2,6 @@
 - hosts: all
   vars:
     home: "{{ lookup('env', 'HOME') }}"
-    docker_compose_path: "/usr/local/bin/docker-compose"
-    docker_compose_version: 1.25.4
     apt_packages:
       - automake
       - bash
@@ -40,7 +38,7 @@
       - vim
       - zsh
   tasks:
-      - name: apt installs for debian 10
+      - name: apt installs for debian 11
         become: yes
         block:
           - name: upgrade dist
