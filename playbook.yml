@@ -66,10 +66,33 @@
             apt:
               autoremove: yes
 
+      - name: install python2 pip
+        block:
+          - name: check if install script is downloaded
+            stat:
+              path: "./tmp/get-pip.py"
+            register: script
+
+          - name: download get-pip.py script
+            get_url:
+              url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+              dest: "./tmp/get-pip.py"
+            when: not script.stat.exists
+
+          - name: run get-pip.py script
+            script: "./tmp/get-pip.py"
+            when: not script.stat.exists
+
       - name: install pip packages
-        pip: 
+        pip:
           name: pynvim
           state: latest
+
+      - name: install pip2 packages
+          pip:
+            name: pynvim
+            state: latest
+            executable: pip2
 
       - name: install ruby packages
         gem:
