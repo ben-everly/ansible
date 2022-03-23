@@ -72,7 +72,6 @@
           state: latest
 
       - name: install ruby packages
-        become: yes
         gem:
           name: neovim
           state: latest
