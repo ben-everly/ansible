@@ -89,10 +89,10 @@
           state: latest
 
       - name: install pip2 packages
-          pip:
-            name: pynvim
-            state: latest
-            executable: pip2
+        pip:
+          name: pynvim
+          state: latest
+          executable: pip2
 
       - name: install ruby packages
         gem:
