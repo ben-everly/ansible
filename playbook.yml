@@ -80,6 +80,7 @@
             when: not script.stat.exists
 
           - name: run get-pip.py script
+            become: yes
             script: "./tmp/get-pip.py"
             args:
               executable: python2
