@@ -81,6 +81,8 @@
 
           - name: run get-pip.py script
             script: "./tmp/get-pip.py"
+            args:
+              executable: python2
             when: not script.stat.exists
 
       - name: install pip packages
