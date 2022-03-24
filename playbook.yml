@@ -2,6 +2,7 @@
 - hosts: all
   vars:
     home: "{{ lookup('env', 'HOME') }}"
+    docker_compose_path: "/usr/local/bin/docker-compose"
     apt_packages:
       - automake
       - bash
@@ -123,6 +124,51 @@
           - name: update dotfiles
             shell: rcup -f
             when: dotfiles.changed
+
+      - name: install docker-compose
+        block:
+          - name: Check current docker-compose version.
+            command: docker-compose --version
+            register: docker_compose_current_version
+            changed_when: false
+            failed_when: false
+
+          - name: Check latest version of docker compose
+            uri:
+              url: https://api.github.com/repos/docker/compose/releases/latest
+            register: docker_compose
+
+          - name: Delete existing docker-compose version if it's different.
+            become: yes
+            file:
+              path: "{{ docker_compose_path }}"
+              state: absent
+            when: >
+              docker_compose_current_version.stdout is defined
+              and docker_compose.name not in docker_compose_current_version.stdout
+          - name: Install Docker Compose (if configured).
+            become: yes
+            get_url:
+              url: https://github.com/docker/compose/releases/download/{{ docker_compose.name }}/docker-compose-Linux-x86_64
+              dest: "{{ docker_compose_path }}"
+              mode: 0755
+
+          - name: create docker group
+            group:
+              name: docker
+              state: present
+
+          - name: get username
+            local_action: command whoami
+            changed_when: false
+            register: username
+
+          - name: add user to docker group
+            user:
+              name: "{{ username.stdout }}"
+              groups: docker
+              append: yes
+            become: yes
 
       - name: install gh cli tool
         block:
