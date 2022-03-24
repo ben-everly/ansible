@@ -145,11 +145,11 @@
               state: absent
             when: >
               docker_compose_current_version.stdout is defined
-              and docker_compose.name not in docker_compose_current_version.stdout
+              and docker_compose.json.name not in docker_compose_current_version.stdout
           - name: Install Docker Compose (if configured).
             become: yes
             get_url:
-              url: https://github.com/docker/compose/releases/download/{{ docker_compose.name }}/docker-compose-Linux-x86_64
+              url: https://github.com/docker/compose/releases/download/{{ docker_compose.json.name }}/docker-compose-Linux-x86_64
               dest: "{{ docker_compose_path }}"
               mode: 0755
 
