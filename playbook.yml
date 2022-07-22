@@ -106,10 +106,17 @@
           name: neovim
           state: latest
 
-      - name: install npm packages
+      - name: install node neovim package
         become: yes
         npm:
           name: neovim
+          global: yes
+          state: latest
+
+      - name: install sql formatter
+        become: yes
+        npm:
+          name: sql-formatter-cli
           global: yes
           state: latest
 
