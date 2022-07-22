@@ -120,6 +120,13 @@
           global: yes
           state: latest
 
+      - name: install pnpm
+        become: yes
+        npm:
+          name: pnpm
+          global: yes
+          state: latest
+
       - name: dotfiles
         block:
           - name: clone dotfiles repo
