@@ -13,7 +13,7 @@
       - fonts-firacode
       - git
       - grep
-      - jq # json prettifier
+      - jq
       - kitty
       - less
       - mariadb-client
