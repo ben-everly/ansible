@@ -18,8 +18,6 @@
       - less
       - mariadb-client
       - neovim
-      - nodejs
-      - npm
       - pkg-config
       - php
       - php-cli
@@ -105,6 +103,27 @@
         gem:
           name: neovim
           state: latest
+
+      - name: Setup Node
+        become: yes
+        block:
+          - name: Install nvm
+            ansible.builtin.shell: >
+              curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.38.0/install.sh | bash
+            args:
+              executable: /bin/bash
+              chdir: "$HOME"
+              creates: "$HOME/.nvm/nvm.sh"
+
+          - name: Install node
+            ansible.builtin.shell: |
+              nvm install {{item}}
+            args:
+              executable: /bin/bash
+              chdir: "$HOME"
+              creates: "$HOME/.nvm/versions/node/v{{item}}"
+            loop:
+              - node
 
       - name: install node neovim package
         become: yes
