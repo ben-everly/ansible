@@ -104,24 +104,22 @@
           name: neovim
           state: latest
 
-      - name: nvm and node
+      - name: volta and node
         become: yes
         block:
-          - name: install nvm
-            command: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.39.1/install.sh | bash
+          - name: install volta
+            command: curl https://get.volta.sh | bash
             args:
               executable: /bin/bash
               chdir: "$HOME"
-              creates: "$HOME/.nvm/nvm.sh"
+              creates: "$HOME/.volta/bin/volta"
 
           - name: install node
-            command: nvm install {{item}}
+            command: volta install node
             args:
               executable: /bin/bash
               chdir: "$HOME"
-              creates: "$HOME/.nvm/versions/node/v{{item}}"
-            loop:
-              - node
+              creates: "$HOME/.volta/bin/node"
 
       - name: install node neovim package
         become: yes
