@@ -15,6 +15,7 @@
       - fonts-firacode
       - git
       - grep
+      - gnome-tweaks
       - jq
       - kitty
       - less
