@@ -3,6 +3,7 @@
   vars:
     home: "{{ lookup('env', 'HOME') }}"
     docker_compose_path: "/usr/local/bin/docker-compose"
+    ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       - automake
       - bash
