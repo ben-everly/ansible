@@ -11,6 +11,7 @@
       - curl
       - docker-ce
       - docker-ce-cli
+      - enpass
       - fonts-firacode
       - git
       - grep
@@ -56,6 +57,17 @@
           - name: add docker apt repository
             apt_repository:
               repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+              state: present
+              filename: docker
+
+          - name: add enpass signing key
+            apt_key:
+              url: https://apt.enpass.io/keys/enpass-linux.key
+              state: present
+
+          - name: add enpass apt repository
+            apt_repository:
+              repo: deb https://apt.enpass.io/ stable main
               state: present
               filename: docker
 
