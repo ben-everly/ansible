@@ -119,38 +119,29 @@
           state: latest
 
       - name: volta and node
-        become: yes
         block:
           - name: install volta
-            command: curl https://get.volta.sh | bash
+            shell: curl https://get.volta.sh | bash
             args:
-              executable: /bin/bash
               chdir: "$HOME"
               creates: "$HOME/.volta/bin/volta"
 
           - name: install node
-            command: volta install node
-            args:
-              executable: /bin/bash
-              chdir: "$HOME"
-              creates: "$HOME/.volta/bin/node"
+            shell: volta install node
 
       - name: install node neovim package
-        become: yes
         npm:
           name: neovim
           global: yes
           state: latest
 
       - name: install sql formatter
-        become: yes
         npm:
           name: sql-formatter-cli
           global: yes
           state: latest
 
       - name: install pnpm
-        become: yes
         npm:
           name: pnpm
           global: yes
