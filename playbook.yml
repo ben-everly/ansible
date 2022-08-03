@@ -27,6 +27,7 @@
       - php-curl
       - php-mbstring
       - php-xml
+      - postgresql-client
       - python2
       - python3
       - python3-pip
