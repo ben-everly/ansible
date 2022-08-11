@@ -12,6 +12,7 @@
       - docker-ce
       - docker-ce-cli
       - enpass
+      - exa
       - fonts-firacode
       - fzf
       - git
