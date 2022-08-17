@@ -45,6 +45,8 @@
       - vim
       - xmlstarlet
       - zsh
+  environment:
+      PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
   tasks:
       - name: apt installs for debian 11
         become: yes
@@ -122,31 +124,41 @@
           name: neovim
           state: latest
 
-      - name: volta and node
-        block:
-          - name: install volta
-            shell: curl https://get.volta.sh | bash
-            args:
-              chdir: "$HOME"
-              creates: "$HOME/.volta/bin/volta"
+      - name: install volta
+        shell: curl https://get.volta.sh | bash
+        args:
+          warn: false
+          chdir: "$HOME"
+          creates: "$HOME/.volta/bin/volta"
 
-          - name: install node
-            shell: volta install node
+      - name: check node version
+        shell:
+          cmd: node -v
+        register: node_version
+        check_mode: false
+        changed_when: false
+
+      - name: install node
+        shell: volta install node
+        when: node_version.rc != 0
 
       - name: install node neovim package
         npm:
+          executable: "$HOME/.volta/bin/npm"
           name: neovim
           global: yes
           state: latest
 
       - name: install sql formatter
         npm:
+          executable: "$HOME/.volta/bin/npm"
           name: sql-formatter-cli
           global: yes
           state: latest
 
       - name: install pnpm
         npm:
+          executable: "$HOME/.volta/bin/npm"
           name: pnpm
           global: yes
           state: latest
