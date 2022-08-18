@@ -282,3 +282,9 @@
         become: yes
         shell:
           cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
+
+      - name: install ecsy
+        get_url:
+          url: https://github.com/oberd/ecsy/releases/download/v0.2.14/ecsy-v0.2.14-darwin-amd64
+          dest: ~/.local/bin/ecsy
+          mode: '755'
