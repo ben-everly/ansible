@@ -53,11 +53,6 @@
       - name: apt installs for debian 11
         become: yes
         block:
-          - name: upgrade dist
-            apt:
-              upgrade: dist
-              update_cache: yes
-
           - name: add docker signing key
             apt_key:
               url: https://download.docker.com/linux/debian/gpg
@@ -83,7 +78,7 @@
           - name: Install apt packages
             apt:
               name: "{{ apt_packages }}"
-              state: present
+              state: latest
               update_cache: yes
 
           - name: apt cleanup
