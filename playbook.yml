@@ -281,3 +281,8 @@
               mode: '0755'
             become: yes
             when: not version.stat.exists
+
+      - name: set default shell
+        become: yes
+        shell:
+          cmd: chsh -s /usr/bin/zsh {{ username.stdout }}
