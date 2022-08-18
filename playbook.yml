@@ -9,6 +9,7 @@
       - bash
       - composer
       - curl
+      - dconf-editor
       - docker-ce
       - docker-ce-cli
       - enpass
