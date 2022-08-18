@@ -209,14 +209,9 @@
               name: docker
               state: present
 
-          - name: get username
-            local_action: command whoami
-            changed_when: false
-            register: username
-
           - name: add user to docker group
             user:
-              name: "{{ username.stdout }}"
+              name: "{{ ansible_user_id }}"
               groups: docker
               append: yes
             become: yes
@@ -285,4 +280,4 @@
       - name: set default shell
         become: yes
         shell:
-          cmd: chsh -s /usr/bin/zsh {{ username.stdout }}
+          cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
