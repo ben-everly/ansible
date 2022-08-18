@@ -288,3 +288,13 @@
           url: https://github.com/oberd/ecsy/releases/download/v0.2.14/ecsy-v0.2.14-darwin-amd64
           dest: ~/.local/bin/ecsy
           mode: '755'
+
+      - name: set alternatives
+        become: yes
+        shell:
+          cmd: |
+            update-alternatives --set x-terminal-emulator /usr/bin/kitty
+            update-alternatives --set vi /usr/bin/nvim
+            update-alternatives --set vim /usr/bin/nvim
+            update-alternatives --set editor /usr/bin/nvim
+            update-alternatives --set view /usr/libexec/neovim/view
