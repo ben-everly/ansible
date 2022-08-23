@@ -6,6 +6,7 @@
     ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       - automake
+      - awscli
       - bash
       - composer
       - curl
