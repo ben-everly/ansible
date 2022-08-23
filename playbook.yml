@@ -24,6 +24,7 @@
       - jq
       - kitty
       - less
+      - libnss3-tools
       - mariadb-client
       - neovim
       - pkg-config
