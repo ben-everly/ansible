@@ -335,3 +335,18 @@
             become: yes
             apt: deb="./tmp/zoom.deb"
             when: zoom_file.changed
+
+      - name: install jet
+        block:
+          - name: download jet
+            get_url:
+              url: https://s3.amazonaws.com/codeship-jet-releases/2.14.0/jet-linux_amd64_2.14.0.tar.gz
+              dest: "./tmp/jet.tar.gz"
+            register: jet_file
+
+          - name: unzip jet
+            when: jet_file.changed
+            unarchive:
+              src: ./tmp/jet.tar.gz
+              dest: ~/.local/bin
+              mode: 755
