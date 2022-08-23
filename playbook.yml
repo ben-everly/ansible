@@ -294,3 +294,21 @@
             update-alternatives --set vim /usr/bin/nvim
             update-alternatives --set editor /usr/bin/nvim
             update-alternatives --set view /usr/libexec/neovim/view
+
+      - name: install dropbox
+        block:
+          - name: check if dropbox is installed
+            command: dpkg-query -W dropbox
+            register: dropbox_version
+            failed_when: dropbox_version.rc > 1
+            changed_when: dropbox_version.rc == 1
+
+          - name: download dropbox deb
+            get_url:
+              url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
+              dest: "./tmp/dropbox.deb"
+
+          - name: install dropbox
+            become: yes
+            apt: deb="./tmp/dropbox.deb"
+            when: dropbox_version.rc == 1
