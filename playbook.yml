@@ -50,7 +50,7 @@
   environment:
       PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
   tasks:
-      - name: apt installs for debian 11
+      - name: apt installs
         become: yes
         block:
           - name: add docker signing key
