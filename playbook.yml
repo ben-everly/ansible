@@ -18,6 +18,7 @@
       - fonts-firacode
       - fzf
       - git
+      - golang-go
       - grep
       - gnome-tweaks
       - jq
