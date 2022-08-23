@@ -103,17 +103,17 @@
             register: script
 
           - name: download get-pip.py script
+            when: not script.stat.exists
             get_url:
               url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
-              dest: "./tmp/get-pip.py"
-            when: not script.stat.exists
+              dest: ./tmp/get-pip.py
 
           - name: run get-pip.py script
             become: yes
-            script: "./tmp/get-pip.py"
+            when: not script.stat.exists
+            script: ./tmp/get-pip.py
             args:
               executable: python2
-            when: not script.stat.exists
 
       - name: install pip packages
         pip:
@@ -141,14 +141,14 @@
       - name: check node version
         shell:
           cmd: node -v
-        register: node_version
         check_mode: false
         failed_when: false
         changed_when: false
+        register: node_version
 
       - name: install node
-        shell: volta install node
         when: node_version.rc != 0
+        shell: volta install node
 
       - name: install node neovim package
         npm:
@@ -180,16 +180,16 @@
             register: dotfiles
 
           - name: update dotfiles
-            shell: rcup -f
             when: dotfiles.changed
+            shell: rcup -f
 
       - name: install docker-compose
         block:
           - name: Check current docker-compose version.
             command: docker-compose --version
-            register: docker_compose_current_version
-            changed_when: false
             failed_when: false
+            changed_when: false
+            register: docker_compose_current_version
 
           - name: Check latest version of docker compose
             uri:
@@ -198,12 +198,13 @@
 
           - name: Delete existing docker-compose version if it's different.
             become: yes
-            file:
-              path: "{{ docker_compose_path }}"
-              state: absent
             when: >
               docker_compose_current_version.stdout is defined
               and docker_compose.json.name not in docker_compose_current_version.stdout
+            file:
+              path: "{{ docker_compose_path }}"
+              state: absent
+
           - name: Install Docker Compose (if configured).
             become: yes
             get_url:
@@ -217,11 +218,11 @@
               state: present
 
           - name: add user to docker group
+            become: yes
             user:
               name: "{{ ansible_user_id }}"
               groups: docker
               append: yes
-            become: yes
 
       - name: install gh cli tool
         block:
@@ -242,15 +243,15 @@
             register: version
 
           - name: download latest version of gh cli
+            when: not version.stat.exists
             get_url:
               url: "{{ url }}"
               dest: "{{ filename }}"
-            when: not version.stat.exists
 
           - name: install latest version of gh cli
-            apt: deb="{{ filename }}"
             become: yes
             when: not version.stat.exists
+            apt: deb="{{ filename }}"
 
       - name: install dbxcli tool
         block:
@@ -271,18 +272,18 @@
             register: version
 
           - name: download latest version of dbxcli
+            when: not version.stat.exists
             get_url:
               url: "{{ url }}"
               dest: "{{ filename }}"
-            when: not version.stat.exists
 
           - name: copy executable into path
+            become: yes
+            when: not version.stat.exists
             copy:
               src: "{{ filename }}"
               dest: /usr/local/bin/dbxcli
               mode: 755
-            become: yes
-            when: not version.stat.exists
 
       - name: set default shell
         become: yes
@@ -309,40 +310,40 @@
         block:
           - name: check if dropbox is installed
             command: dpkg-query -W dropbox
-            register: dropbox_version
             failed_when: dropbox_version.rc > 1
             changed_when: dropbox_version.rc == 1
+            register: dropbox_version
 
           - name: download dropbox deb
+            when: dropbox_version.rc == 1
             get_url:
               url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
-              dest: "./tmp/dropbox.deb"
-            when: dropbox_version.rc == 1
+              dest: ./tmp/dropbox.deb
 
           - name: install dropbox
             become: yes
-            apt: deb="./tmp/dropbox.deb"
             when: dropbox_version.rc == 1
+            apt: deb="./tmp/dropbox.deb"
 
       - name: install zoom
         block:
           - name: download zoom deb
             get_url:
               url: https://zoom.us/client/latest/zoom_amd64.deb
-              dest: "./tmp/zoom.deb"
+              dest: ./tmp/zoom.deb
             register: zoom_file
 
           - name: install zoom
             become: yes
-            apt: deb="./tmp/zoom.deb"
             when: zoom_file.changed
+            apt: deb="./tmp/zoom.deb"
 
       - name: install jet
         block:
           - name: download jet
             get_url:
               url: https://s3.amazonaws.com/codeship-jet-releases/2.14.0/jet-linux_amd64_2.14.0.tar.gz
-              dest: "./tmp/jet.tar.gz"
+              dest: ./tmp/jet.tar.gz
             register: jet_file
 
           - name: unzip jet
