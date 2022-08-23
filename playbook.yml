@@ -209,7 +209,7 @@
             get_url:
               url: https://github.com/docker/compose/releases/download/{{ docker_compose.json.name }}/docker-compose-Linux-x86_64
               dest: "{{ docker_compose_path }}"
-              mode: 0755
+              mode: 755
 
           - name: create docker group
             group:
@@ -280,7 +280,7 @@
             copy:
               src: "{{ filename }}"
               dest: /usr/local/bin/dbxcli
-              mode: '0755'
+              mode: 755
             become: yes
             when: not version.stat.exists
 
@@ -293,7 +293,7 @@
         get_url:
           url: https://github.com/oberd/ecsy/releases/download/v0.2.14/ecsy-v0.2.14-linux
           dest: ~/.local/bin/ecsy
-          mode: '755'
+          mode: 755
 
       - name: set alternatives
         become: yes
