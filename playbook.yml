@@ -316,8 +316,22 @@
             get_url:
               url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
               dest: "./tmp/dropbox.deb"
+            when: dropbox_version.rc == 1
 
           - name: install dropbox
             become: yes
             apt: deb="./tmp/dropbox.deb"
             when: dropbox_version.rc == 1
+
+      - name: install zoom
+        block:
+          - name: download zoom deb
+            get_url:
+              url: https://zoom.us/client/latest/zoom_amd64.deb
+              dest: "./tmp/zoom.deb"
+            register: zoom_file
+
+          - name: install zoom
+            become: yes
+            apt: deb="./tmp/zoom.deb"
+            when: zoom_file.changed
