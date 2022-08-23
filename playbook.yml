@@ -2,7 +2,7 @@
 - hosts: all
   vars:
     home: "{{ lookup('env', 'HOME') }}"
-    docker_compose_path: "/usr/local/bin/docker-compose"
+    docker_compose_path: /usr/local/bin/docker-compose
     ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       - automake
@@ -100,13 +100,13 @@
         block:
           - name: check if install script is downloaded
             stat:
-              path: "./tmp/get-pip.py"
+              path: ./tmp/get-pip.py
             register: script
 
           - name: download get-pip.py script
             when: not script.stat.exists
             get_url:
-              url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+              url: https://bootstrap.pypa.io/pip/2.7/get-pip.py
               dest: ./tmp/get-pip.py
 
           - name: run get-pip.py script
@@ -176,7 +176,7 @@
         block:
           - name: clone dotfiles repo
             git:
-              repo: "https://github.com/ben-everly/dotfiles"
+              repo: https://github.com/ben-everly/dotfiles
               dest: "{{ home }}/.dotfiles"
             register: dotfiles
 
