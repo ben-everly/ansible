@@ -25,6 +25,7 @@
       - kitty
       - less
       - libnss3-tools
+      - make
       - mariadb-client
       - neovim
       - pkg-config
@@ -169,6 +170,13 @@
         npm:
           executable: "$HOME/.volta/bin/npm"
           name: pnpm
+          global: yes
+          state: latest
+
+      - name: install typescript
+        npm:
+          executable: "$HOME/.volta/bin/npm"
+          name: typescript
           global: yes
           state: latest
 
@@ -353,3 +361,17 @@
               src: ./tmp/jet.tar.gz
               dest: ~/.local/bin
               mode: 755
+
+      - name: pop shell
+        block:
+          - name: clone pop shell repo
+            git:
+              repo: https://github.com/pop-os/shell.git
+              dest: "{{ home }}/.pop_shell"
+            register: pop_shell
+
+          - name: install pop shell
+            when: pop_shell.changed
+            make:
+              chdir: "{{ home }}/.pop_shell"
+              target: local-install
