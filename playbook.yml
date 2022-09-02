@@ -367,11 +367,11 @@
           - name: clone pop shell repo
             git:
               repo: https://github.com/pop-os/shell.git
-              dest: "{{ home }}/.pop_shell"
+              dest: ./tmp/pop_shell
             register: pop_shell
 
           - name: install pop shell
             when: pop_shell.changed
             make:
-              chdir: "{{ home }}/.pop_shell"
+              chdir: ./tmp/pop_shell
               target: local-install
