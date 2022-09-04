@@ -9,18 +9,21 @@
       - awscli
       - bash
       - composer
+      - cryptsetup
       - curl
       - dconf-editor
       - docker-ce
       - docker-ce-cli
       - enpass
       - exa
+      - file
       - fonts-firacode
       - fzf
       - git
       - golang-go
       - grep
       - gnome-tweaks
+      - gnupg
       - jq
       - kitty
       - less
@@ -28,6 +31,9 @@
       - make
       - mariadb-client
       - neovim
+      - pass
+      - pass-extension-tomb
+      - pinentry-curses
       - pkg-config
       - php
       - php-cli
@@ -46,6 +52,7 @@
       - sed
       - silversearcher-ag
       - snapd
+      - sudo
       - tmux
       - universal-ctags
       - unzip
@@ -394,3 +401,24 @@
             args:
               chdir: ./tmp/php-debug-client
             command: npm run build
+
+      - name: install tomb
+        block:
+          - name: download tomb
+            get_url:
+              url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
+              dest: ./tmp/tomb.tar.gz
+            register: tomb_file
+
+          - name: unzip tomb_file
+            when: tomb_file.changed
+            shell: tar xvfz ./tomb.tar.gz
+            args:
+              chdir: ./tmp
+
+          - name: run make
+            become: true
+            when: tomb_file.changed
+            make:
+              chdir: ./tmp/Tomb-2.9
+              target: install
