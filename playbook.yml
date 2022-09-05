@@ -326,21 +326,23 @@
 
       - name: install dropbox
         block:
-          - name: check if dropbox is installed
-            command: dpkg-query -W dropbox
-            failed_when: dropbox_version.rc > 1
-            changed_when: dropbox_version.rc == 1
-            register: dropbox_version
-
           - name: download dropbox deb
-            when: dropbox_version.rc == 1
             get_url:
               url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
               dest: ./tmp/dropbox.deb
+            register: dropbox_file
+
+          - name: add dropbox signing key
+            become: yes
+            when: dropbox_file.changed
+            get_url:
+              url: https://www.linuxbabe.com/dropbox-signing-key.asc
+              dest: /etc/apt/trusted.gpg.d/dropbox.asc
+              mode: 644
 
           - name: install dropbox
             become: yes
-            when: dropbox_version.rc == 1
+            when: dropbox_file.changed
             apt: deb="./tmp/dropbox.deb"
 
       - name: install zoom
