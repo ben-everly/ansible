@@ -87,7 +87,7 @@
             apt_repository:
               repo: deb https://apt.enpass.io/ stable main
               state: present
-              filename: docker
+              filename: enpass
 
           - name: Install apt packages
             apt:
