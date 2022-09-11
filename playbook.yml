@@ -32,7 +32,6 @@
       - mariadb-client
       - neovim
       - pass
-      - pass-extension-import
       - pass-extension-tomb
       - pinentry-curses
       - pkg-config
@@ -78,12 +77,6 @@
               dest: /etc/apt/trusted.gpg.d/enpass.asc
               mode: 644
 
-          - name: add pujol signing key
-            get_url:
-              url: https://pkg.pujol.io/debian/gpgkey
-              dest: /etc/apt/trusted.gpg.d/pujol.asc
-              mode: 644
-
           - name: add docker apt repository
             apt_repository:
               repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
@@ -95,12 +88,6 @@
               repo: deb https://apt.enpass.io/ stable main
               state: present
               filename: enpass
-
-          - name: add pujol apt repository
-            apt_repository:
-              repo: deb https://pkg.pujol.io/debian/repo all main
-              state: present
-              filename: pujol
 
           - name: Install apt packages
             apt:
