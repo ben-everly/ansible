@@ -30,7 +30,6 @@
       - libnss3-tools
       - make
       - mariadb-client
-      - neovim
       - pass
       - pass-extension-tomb
       - pinentry-curses
@@ -98,6 +97,35 @@
           - name: apt cleanup
             apt:
               autoremove: yes
+
+      - name: install neovim
+        block:
+          - name: Check current neovim version.
+            shell: nvim --version | head -n 1
+            failed_when: false
+            changed_when: false
+            register: nvim_current_version
+
+          - name: Check latest version of neovim
+            uri:
+              url: https://api.github.com/repos/neovim/neovim/releases/latest
+            register: neovim
+
+          - name: Download nvim deb
+            become: yes
+            when: >
+              nvim_current_version.stdout is defined
+              and neovim.json.name|lower not in nvim_current_version.stdout|lower
+            get_url:
+              url: "{{ neovim|json_query('json.assets[?name == `nvim-linux64.deb`].browser_download_url|[0]') }}"
+              dest: ./tmp/neovim.deb
+              mode: 755
+            register: neovim_file
+
+          - name: install neovim
+            become: yes
+            when: neovim_file.changed
+            apt: deb="./tmp/neovim.deb"
 
       - name: snap installs
         become: yes
@@ -319,10 +347,6 @@
         shell:
           cmd: |
             update-alternatives --set x-terminal-emulator /usr/bin/kitty
-            update-alternatives --set vi /usr/bin/nvim
-            update-alternatives --set vim /usr/bin/nvim
-            update-alternatives --set editor /usr/bin/nvim
-            update-alternatives --set view /usr/libexec/neovim/view
 
       - name: install dropbox
         block:
