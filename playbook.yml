@@ -16,6 +16,7 @@
       - docker-ce-cli
       - enpass
       - exa
+      - fd-find
       - file
       - fonts-firacode
       - fzf
