@@ -12,6 +12,8 @@
       - cryptsetup
       - curl
       - dconf-editor
+      - default-jdk
+      - default-jre
       - docker-ce
       - docker-ce-cli
       - enpass
