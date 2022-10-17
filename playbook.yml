@@ -31,6 +31,8 @@
       - kitty
       - less
       - libnss3-tools
+      - libc6-x32
+      - libc6-i386
       - make
       - mariadb-client
       - pass
@@ -472,3 +474,16 @@
         shell: curl -fsSL https://raw.github.com/cknadler/vim-anywhere/master/install | bash
         args:
           creates: $HOME/.vim-anywhere
+
+      - name: install javaSE
+        block:
+          - name: download javaSE
+            get_url:
+            url: https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb
+            dest: ./tmp/javaSE.deb
+            register: javaSE_file
+
+          - name: install javaSE
+            become: yes
+            when: javaSE_file.changed
+            apt: deb="./tmp/javaSE.deb"
