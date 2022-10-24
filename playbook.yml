@@ -479,8 +479,8 @@
         block:
           - name: download javaSE
             get_url:
-            url: https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb
-            dest: ./tmp/javaSE.deb
+              url: https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb
+              dest: ./tmp/javaSE.deb
             register: javaSE_file
 
           - name: install javaSE
