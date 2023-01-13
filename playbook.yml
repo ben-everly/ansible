@@ -2,7 +2,7 @@
 - hosts: all
   vars:
     home: "{{ lookup('env', 'HOME') }}"
-    docker_compose_path: /usr/local/bin/docker-compose
+    docker_compose_version: v2.15.1
     ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       - automake
@@ -14,8 +14,6 @@
       - dconf-editor
       - default-jdk
       - default-jre
-      - docker-ce
-      - docker-ce-cli
       - enpass
       - exa
       - fd-find
@@ -66,27 +64,17 @@
       - zsh
   environment:
       PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
+  roles:
+    - { role: geerlingguy.docker, become: yes }
   tasks:
       - name: apt installs
         become: yes
         block:
-          - name: add docker signing key
-            get_url:
-              url: https://download.docker.com/linux/debian/gpg
-              dest: /etc/apt/trusted.gpg.d/docker.asc
-              mode: 644
-
           - name: add enpass signing key
             get_url:
               url: https://apt.enpass.io/keys/enpass-linux.key
               dest: /etc/apt/trusted.gpg.d/enpass.asc
               mode: 644
-
-          - name: add docker apt repository
-            apt_repository:
-              repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
-              state: present
-              filename: docker
 
           - name: add enpass apt repository
             apt_repository:
@@ -234,47 +222,6 @@
           - name: update dotfiles
             when: dotfiles.changed
             shell: rcup -f
-
-      - name: install docker-compose
-        block:
-          - name: Check current docker-compose version.
-            command: docker-compose --version
-            failed_when: false
-            changed_when: false
-            register: docker_compose_current_version
-
-          - name: Check latest version of docker compose
-            uri:
-              url: https://api.github.com/repos/docker/compose/releases/latest
-            register: docker_compose
-
-          - name: Delete existing docker-compose version if it's different.
-            become: yes
-            when: >
-              docker_compose_current_version.stdout is defined
-              and docker_compose.json.name not in docker_compose_current_version.stdout
-            file:
-              path: "{{ docker_compose_path }}"
-              state: absent
-
-          - name: Install Docker Compose (if configured).
-            become: yes
-            get_url:
-              url: https://github.com/docker/compose/releases/download/{{ docker_compose.json.name }}/docker-compose-Linux-x86_64
-              dest: "{{ docker_compose_path }}"
-              mode: 755
-
-          - name: create docker group
-            group:
-              name: docker
-              state: present
-
-          - name: add user to docker group
-            become: yes
-            user:
-              name: "{{ ansible_user_id }}"
-              groups: docker
-              append: yes
 
       - name: install gh cli tool
         block:
