@@ -52,15 +52,12 @@
       - rcm
       - ruby-full
       - sed
-      - silversearcher-ag
       - snapd
       - sudo
-      - tmux
       - universal-ctags
       - unzip
       - vim
       - vim-gtk3
-      - xmlstarlet
       - zsh
   environment:
       PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
