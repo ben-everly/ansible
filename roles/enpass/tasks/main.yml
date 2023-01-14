@@ -1,0 +1,19 @@
+---
+
+- name: add enpass signing key
+  get_url:
+    url: https://apt.enpass.io/keys/enpass-linux.key
+    dest: /etc/apt/trusted.gpg.d/enpass.asc
+    mode: 644
+
+- name: add enpass apt repository
+  apt_repository:
+    repo: deb https://apt.enpass.io/ stable main
+    state: present
+    filename: enpass
+
+- name: Install apt packages
+  apt:
+    name: enpass
+    state: latest
+    update_cache: true
