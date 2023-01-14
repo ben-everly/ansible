@@ -40,11 +40,11 @@
   environment:
       PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
   roles:
-    - { role: geerlingguy.docker, become: yes }
-    - { role: enpass, become: yes }
-    - { role: oberd, become: yes }
-    - { role: cli-dev-tools, become: yes }
-    - { role: neovim, become: yes }
+    - { role: geerlingguy.docker, become: true }
+    - { role: enpass, become: true }
+    - { role: oberd, become: true }
+    - { role: cli-dev-tools, become: true }
+    - { role: neovim, become: true }
   tasks:
       - name: apt installs
         become: yes
