@@ -63,6 +63,7 @@
   roles:
     - { role: geerlingguy.docker, become: yes }
     - { role: enpass, become: yes }
+    - { role: oberd, become: yes }
   tasks:
       - name: apt installs
         become: yes
@@ -111,7 +112,6 @@
         snap:
           name:
             - spotify
-            - slack
 
       - name: install python2 pip
         block:
@@ -299,19 +299,6 @@
             become: yes
             when: dropbox_file.changed
             apt: deb="./tmp/dropbox.deb"
-
-      - name: install zoom
-        block:
-          - name: download zoom deb
-            get_url:
-              url: https://zoom.us/client/latest/zoom_amd64.deb
-              dest: ./tmp/zoom.deb
-            register: zoom_file
-
-          - name: install zoom
-            become: yes
-            when: zoom_file.changed
-            apt: deb="./tmp/zoom.deb"
 
       - name: install jet
         block:

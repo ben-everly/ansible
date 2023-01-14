@@ -1,0 +1,18 @@
+---
+
+- name: snap installs
+  snap:
+    name:
+      - slack
+
+- name: install zoom
+  block:
+    - name: download zoom deb
+      get_url:
+        url: https://zoom.us/client/latest/zoom_amd64.deb
+        dest: ./tmp/zoom.deb
+      register: zoom_file
+
+    - name: install zoom
+      when: zoom_file.changed
+      apt: deb="./tmp/zoom.deb"
