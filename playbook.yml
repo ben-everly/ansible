@@ -7,31 +7,19 @@
     apt_packages:
       - automake
       - awscli
-      - bash
       - composer
       - cryptsetup
-      - curl
       - dconf-editor
       - default-jdk
       - default-jre
-      - exa
-      - fd-find
-      - file
       - fonts-firacode
-      - fzf
-      - git
       - golang-go
-      - grep
       - gnome-tweaks
       - gnupg
-      - jq
-      - kitty
-      - less
       - libnss3-tools
       - libc6-x32
       - libc6-i386
       - make
-      - mariadb-client
       - pass
       - pass-extension-tomb
       - pinentry-curses
@@ -41,29 +29,21 @@
       - php-curl
       - php-mbstring
       - php-xml
-      - postgresql-client
       - python2
       - python3
       - python3-gpg
       - python3-pip
-      - ranger
-      - ripgrep
       - rcm
       - ruby-full
-      - sed
       - snapd
-      - sudo
       - universal-ctags
-      - unzip
-      - vim
-      - vim-gtk3
-      - zsh
   environment:
       PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
   roles:
     - { role: geerlingguy.docker, become: yes }
     - { role: enpass, become: yes }
     - { role: oberd, become: yes }
+    - { role: cli-dev-tools, become: yes }
   tasks:
       - name: apt installs
         become: yes

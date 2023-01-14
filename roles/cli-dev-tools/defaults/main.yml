@@ -1,0 +1,22 @@
+---
+
+cli_apt_packages:
+  - bash
+  - curl
+  - exa
+  - fd-find
+  - fzf
+  - git
+  - grep
+  - jq
+  - kitty
+  - less
+  - mariadb-client
+  - postgresql-client
+  - ranger
+  - ripgrep
+  - sed
+  - sudo
+  - unzip
+  - vim
+  - zsh

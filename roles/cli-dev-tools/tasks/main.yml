@@ -1,0 +1,7 @@
+---
+
+- name: Install apt packages
+  apt:
+    name: "{{ cli_apt_packages }}"
+    state: latest
+    update_cache: true
