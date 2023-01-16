@@ -1,0 +1,15 @@
+- name: Install apt packages
+  apt:
+    name: rcm
+    state: latest
+    update_cache: true
+
+- name: clone dotfiles repo
+  git:
+    repo: https://github.com/ben-everly/dotfiles
+    dest: $HOME/.dotfiles
+  register: dotfiles
+
+- name: update dotfiles
+  when: dotfiles.changed
+  shell: rcup -f
