@@ -64,6 +64,9 @@
       - name: ruby
         versions: [ "latest" ]
         global: "latest"
+      - name: python
+        versions: [ "2.7.18" ]
+        global: "2.7.18"
     - role: spotify
       become: true
   tasks:
@@ -79,26 +82,6 @@
           - name: apt cleanup
             apt:
               autoremove: yes
-
-      - name: install python2 pip
-        block:
-          - name: check if install script is downloaded
-            stat:
-              path: ./tmp/get-pip.py
-            register: script
-
-          - name: download get-pip.py script
-            when: not script.stat.exists
-            get_url:
-              url: https://bootstrap.pypa.io/pip/2.7/get-pip.py
-              dest: ./tmp/get-pip.py
-
-          - name: run get-pip.py script
-            become: yes
-            when: not script.stat.exists
-            script: ./tmp/get-pip.py
-            args:
-              executable: python2
 
       - name: install pip packages
         pip:
