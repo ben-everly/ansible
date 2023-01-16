@@ -83,12 +83,6 @@
             apt:
               autoremove: yes
 
-      - name: install pnpm
-        npm:
-          name: pnpm
-          global: yes
-          state: latest
-
       - name: install typescript
         npm:
           name: typescript
