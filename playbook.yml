@@ -7,13 +7,9 @@
     apt_packages:
       - automake
       - awscli
-      - composer
       - cryptsetup
       - dconf-editor
-      - default-jdk
-      - default-jre
       - fonts-firacode
-      - golang-go
       - gnome-tweaks
       - gnupg
       - libnss3-tools
@@ -24,21 +20,13 @@
       - pass-extension-tomb
       - pinentry-curses
       - pkg-config
-      - php
-      - php-cli
-      - php-curl
-      - php-mbstring
-      - php-xml
       - python2
       - python3
       - python3-gpg
       - python3-pip
       - rcm
-      - ruby-full
       - snapd
       - universal-ctags
-  environment:
-      PATH: "{{home}}/.volta/bin:{{ansible_env.PATH}}"
   roles:
     - role: geerlingguy.docker
       become: true
@@ -50,6 +38,34 @@
       become: true
     - role: neovim
       become: true
+    - role: cimon-io.asdf
+      asdf_user: ben
+      asdf_group: ben
+      asdf_apt_optional_dependencies:
+       - libsqlite3-dev
+       - libgd-dev
+       - libonig-dev
+       - libpq-dev
+       - libzip-dev
+      asdf_plugins:
+      - name: golang
+        repository: https://github.com/kennyp/asdf-golang.git
+        versions: [ "latest" ]
+        global: "latest"
+      - name: nodejs
+        versions: [ "latest" ]
+        global: "latest"
+      - name: php
+        versions: [ "latest" ]
+        global: "latest"
+      - name: java
+        repository: https://github.com/halcyon/asdf-java.git
+        versions: [ "latest:openjdk" ]
+        global: "latest"
+      - name: ruby
+        versions: [ "latest" ]
+        global: "latest"
+
   tasks:
       - name: apt installs
         become: yes
@@ -106,42 +122,20 @@
           name: neovim
           state: latest
 
-      - name: install volta
-        shell: curl https://get.volta.sh | bash
-        args:
-          warn: false
-          chdir: "$HOME"
-          creates: "$HOME/.volta/bin/volta"
-
-      - name: check node version
-        shell:
-          cmd: node -v
-        check_mode: false
-        failed_when: false
-        changed_when: false
-        register: node_version
-
-      - name: install node
-        when: node_version.rc != 0
-        shell: volta install node
-
       - name: install node neovim package
         npm:
-          executable: "$HOME/.volta/bin/npm"
           name: neovim
           global: yes
           state: latest
 
       - name: install pnpm
         npm:
-          executable: "$HOME/.volta/bin/npm"
           name: pnpm
           global: yes
           state: latest
 
       - name: install typescript
         npm:
-          executable: "$HOME/.volta/bin/npm"
           name: typescript
           global: yes
           state: latest
