@@ -25,7 +25,6 @@
       - python3-gpg
       - python3-pip
       - rcm
-      - snapd
       - universal-ctags
   roles:
     - role: geerlingguy.docker
@@ -65,7 +64,8 @@
       - name: ruby
         versions: [ "latest" ]
         global: "latest"
-
+    - role: spotify
+      become: true
   tasks:
       - name: apt installs
         become: yes
@@ -79,12 +79,6 @@
           - name: apt cleanup
             apt:
               autoremove: yes
-
-      - name: snap installs
-        become: yes
-        snap:
-          name:
-            - spotify
 
       - name: install python2 pip
         block:
