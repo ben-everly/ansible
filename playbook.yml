@@ -83,12 +83,6 @@
             apt:
               autoremove: yes
 
-      - name: install typescript
-        npm:
-          name: typescript
-          global: yes
-          state: latest
-
       - name: dotfiles
         block:
           - name: clone dotfiles repo
