@@ -85,7 +85,7 @@
           - name: clone dotfiles repo
             git:
               repo: https://github.com/ben-everly/dotfiles
-              dest: "$HOME/.dotfiles"
+              dest: $HOME/.dotfiles
             register: dotfiles
 
           - name: update dotfiles
