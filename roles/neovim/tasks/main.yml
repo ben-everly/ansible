@@ -22,6 +22,7 @@
   register: neovim_file
 
 - name: install neovim
+  become: true
   when: neovim_file.changed
   apt: deb="./tmp/neovim.deb"
 

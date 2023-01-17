@@ -34,7 +34,6 @@
     - role: cli-dev-tools
       become: true
     - role: neovim
-      become: true
     - role: cimon-io.asdf
       asdf_user: ben
       asdf_group: ben
