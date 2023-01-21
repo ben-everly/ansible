@@ -19,7 +19,6 @@
       - pass-extension-tomb
       - pinentry-curses
       - pkg-config
-      - python2
       - python3
       - python3-gpg
       - python3-pip
