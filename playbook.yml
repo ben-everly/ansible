@@ -74,6 +74,8 @@
     - role: jet
     - role: pop-shell
     - role: vim-anywhere
+    - role: chrome
+      become: true
   tasks:
       - name: apt installs
         become: yes
@@ -108,19 +110,6 @@
             make:
               chdir: ./tmp/Tomb-2.9
               target: install
-
-      - name: install chrome
-        block:
-          - name: download chrome
-            get_url:
-              url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-              dest: ./tmp/chrome.deb
-            register: chrome_file
-
-          - name: install chrome
-            become: yes
-            when: chrome_file.changed
-            apt: deb="./tmp/chrome.deb"
 
       - name: install javaSE
         block:
