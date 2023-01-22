@@ -69,6 +69,7 @@
       become: true
     - role: gh-cli
       become: true
+    - role: dbxcli
   tasks:
       - name: apt installs
         become: yes
@@ -82,38 +83,6 @@
           - name: apt cleanup
             apt:
               autoremove: yes
-
-      - name: install dbxcli tool
-        block:
-          - name: find latest release of dbxcli
-            uri:
-              url: https://api.github.com/repos/dropbox/dbxcli/releases/latest
-            register: download
-
-          - set_fact:
-              asset: "{{ download.json.assets | select('match', '.*linux-amd64') | first }}"
-          - set_fact:
-              filename: "./tmp/{{ download.json.name}}-{{ asset.name }}"
-              url: "{{ asset.browser_download_url }}"
-
-          - name: check if latest version of dbxcli is already downloaded
-            stat:
-              path: "{{ filename }}"
-            register: version
-
-          - name: download latest version of dbxcli
-            when: not version.stat.exists
-            get_url:
-              url: "{{ url }}"
-              dest: "{{ filename }}"
-
-          - name: copy executable into path
-            become: yes
-            when: not version.stat.exists
-            copy:
-              src: "{{ filename }}"
-              dest: /usr/local/bin/dbxcli
-              mode: 755
 
       - name: set default shell
         become: yes

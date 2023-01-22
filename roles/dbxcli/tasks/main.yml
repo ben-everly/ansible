@@ -1,0 +1,27 @@
+- name: find latest release of dbxcli
+  uri:
+    url: https://api.github.com/repos/dropbox/dbxcli/releases/latest
+  register: download
+
+- set_fact:
+    asset: "{{ download.json.assets | select('match', '.*linux-amd64') | first }}"
+- set_fact:
+    filename: "./tmp/{{ download.json.name}}-{{ asset.name }}"
+    url: "{{ asset.browser_download_url }}"
+
+- name: check if latest version of dbxcli is already downloaded
+  stat:
+    path: "{{ filename }}"
+  register: version
+
+- name: download latest version of dbxcli
+  when: not version.stat.exists
+  get_url:
+    url: "{{ url }}"
+    dest: "{{ filename }}"
+
+- name: copy executable into path
+  copy:
+    src: "{{ filename }}"
+    dest: $HOME/.local/bin/dbxcli
+    mode: 755
