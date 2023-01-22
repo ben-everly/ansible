@@ -3,3 +3,10 @@
     url: https://github.com/oberd/ecsy/releases/download/v0.2.15/ecsy-v0.2.15-linux
     dest: ~/.local/bin/ecsy
     mode: 755
+
+- name: Install apt packages
+  become: true
+  apt:
+    name: awscli
+    state: latest
+    update_cache: yes
