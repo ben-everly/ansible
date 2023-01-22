@@ -1,5 +1,3 @@
----
-
 - name: Check current neovim version.
   shell: nvim --version | head -n 1
   failed_when: false
@@ -47,3 +45,20 @@
     name: neovim
     global: yes
     state: latest
+
+- name: clone php debug client repo
+  git:
+    repo: https://github.com/xdebug/vscode-php-debug.git
+    dest: ./tmp/php-debug-client
+  register: php_debug_client
+
+- name: install deps for php debug client
+  when: php_debug_client.changed
+  npm:
+    path: ./tmp/php-debug-client
+
+- name: build php debug client
+  when: php_debug_client.changed
+  args:
+    chdir: ./tmp/php-debug-client
+  command: npm run build
