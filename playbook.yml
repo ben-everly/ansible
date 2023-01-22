@@ -6,8 +6,6 @@
     apt_packages:
       - automake
       - cryptsetup
-      - dconf-editor
-      - fonts-firacode
       - gnome-tweaks
       - gnupg
       - libnss3-tools
@@ -75,6 +73,7 @@
     - role: vim-anywhere
     - role: chrome
       become: true
+    - role: rcm
   tasks:
       - name: apt installs
         become: yes
