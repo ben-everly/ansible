@@ -70,6 +70,7 @@
     - role: gh-cli
       become: true
     - role: dbxcli
+    - role: aws
   tasks:
       - name: apt installs
         become: yes
@@ -83,12 +84,6 @@
           - name: apt cleanup
             apt:
               autoremove: yes
-
-      - name: install ecsy
-        get_url:
-          url: https://github.com/oberd/ecsy/releases/download/v0.2.15/ecsy-v0.2.15-linux
-          dest: ~/.local/bin/ecsy
-          mode: 755
 
       - name: set alternatives
         become: yes
