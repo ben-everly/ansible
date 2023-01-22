@@ -1,0 +1,11 @@
+- name: clone pop shell repo
+  git:
+    repo: https://github.com/pop-os/shell.git
+    dest: ./tmp/pop_shell
+  register: pop_shell
+
+- name: install pop shell
+  when: pop_shell.changed
+  make:
+    chdir: ./tmp/pop_shell
+    target: local-install
