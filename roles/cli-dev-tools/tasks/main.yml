@@ -5,3 +5,8 @@
     name: "{{ cli_apt_packages }}"
     state: latest
     update_cache: true
+
+- name: set default shell
+  become: true
+  shell:
+    cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}

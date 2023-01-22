@@ -84,11 +84,6 @@
             apt:
               autoremove: yes
 
-      - name: set default shell
-        become: yes
-        shell:
-          cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
-
       - name: install ecsy
         get_url:
           url: https://github.com/oberd/ecsy/releases/download/v0.2.15/ecsy-v0.2.15-linux
