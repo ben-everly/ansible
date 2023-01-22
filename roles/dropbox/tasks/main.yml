@@ -1,0 +1,19 @@
+- name: download dropbox deb
+  get_url:
+    url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
+    dest: ./tmp/dropbox.deb
+  register: dropbox_file
+  retries: 5
+  delay: 10
+  until: dropbox_file.status_code < 400
+
+- name: add dropbox signing key
+  when: dropbox_file.changed
+  get_url:
+    url: https://www.linuxbabe.com/dropbox-signing-key.asc
+    dest: /etc/apt/trusted.gpg.d/dropbox.asc
+    mode: 644
+
+- name: install dropbox
+  when: dropbox_file.changed
+  apt: deb="./tmp/dropbox.deb"
