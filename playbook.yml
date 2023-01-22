@@ -85,12 +85,6 @@
             apt:
               autoremove: yes
 
-      - name: set alternatives
-        become: yes
-        shell:
-          cmd: |
-            update-alternatives --set x-terminal-emulator /usr/bin/kitty
-
       - name: install jet
         block:
           - name: download jet
