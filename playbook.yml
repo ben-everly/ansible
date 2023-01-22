@@ -73,6 +73,7 @@
     - role: aws
     - role: jet
     - role: pop-shell
+    - role: vim-anywhere
   tasks:
       - name: apt installs
         become: yes
@@ -120,11 +121,6 @@
             become: yes
             when: chrome_file.changed
             apt: deb="./tmp/chrome.deb"
-
-      - name: install vim-anywhere
-        shell: curl -fsSL https://raw.github.com/cknadler/vim-anywhere/master/install | bash
-        args:
-          creates: $HOME/.vim-anywhere
 
       - name: install javaSE
         block:
