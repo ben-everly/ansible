@@ -1,3 +1,10 @@
+- name: Install apt packages
+  become: true
+  apt:
+    name: make
+    state: latest
+    update_cache: yes
+
 - name: download tomb
   get_url:
     url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
