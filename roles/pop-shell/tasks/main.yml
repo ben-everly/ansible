@@ -1,3 +1,9 @@
+- name: Install apt packages
+  apt:
+    name: make
+    state: latest
+    update_cache: yes
+
 - name: clone pop shell repo
   git:
     repo: https://github.com/pop-os/shell.git
