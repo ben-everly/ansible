@@ -1,0 +1,25 @@
+- name: find latest release of gh cli
+  uri:
+    url: https://api.github.com/repos/cli/cli/releases/latest
+  register: download
+
+- set_fact:
+    asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
+- set_fact:
+    filename: "./tmp/{{ asset.name }}"
+    url: "{{ asset.browser_download_url }}"
+
+- name: check if latest version of gh cli is already downloaded
+  stat:
+    path: "{{ filename }}"
+  register: version
+
+- name: download latest version of gh cli
+  when: not version.stat.exists
+  get_url:
+    url: "{{ url }}"
+    dest: "{{ filename }}"
+
+- name: install latest version of gh cli
+  when: not version.stat.exists
+  apt: deb="{{ filename }}"

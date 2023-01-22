@@ -67,6 +67,8 @@
       become: true
     - role: dropbox
       become: true
+    - role: gh-cli
+      become: true
   tasks:
       - name: apt installs
         become: yes
@@ -80,35 +82,6 @@
           - name: apt cleanup
             apt:
               autoremove: yes
-
-      - name: install gh cli tool
-        block:
-          - name: find latest release of gh cli
-            uri:
-              url: https://api.github.com/repos/cli/cli/releases/latest
-            register: download
-
-          - set_fact:
-              asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
-          - set_fact:
-              filename: "./tmp/{{ asset.name }}"
-              url: "{{ asset.browser_download_url }}"
-
-          - name: check if latest version of gh cli is already downloaded
-            stat:
-              path: "{{ filename }}"
-            register: version
-
-          - name: download latest version of gh cli
-            when: not version.stat.exists
-            get_url:
-              url: "{{ url }}"
-              dest: "{{ filename }}"
-
-          - name: install latest version of gh cli
-            become: yes
-            when: not version.stat.exists
-            apt: deb="{{ filename }}"
 
       - name: install dbxcli tool
         block:
