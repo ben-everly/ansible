@@ -81,18 +81,6 @@
             apt:
               autoremove: yes
 
-      - name: dotfiles
-        block:
-          - name: clone dotfiles repo
-            git:
-              repo: https://github.com/ben-everly/dotfiles
-              dest: $HOME/.dotfiles
-            register: dotfiles
-
-          - name: update dotfiles
-            when: dotfiles.changed
-            shell: rcup -f
-
       - name: install gh cli tool
         block:
           - name: find latest release of gh cli
