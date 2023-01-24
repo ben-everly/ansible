@@ -1,5 +1,3 @@
----
-
 - name: add enpass signing key
   get_url:
     url: https://apt.enpass.io/keys/enpass-linux.key

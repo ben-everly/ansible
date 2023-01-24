@@ -1,5 +1,3 @@
----
-
 cli_apt_packages:
   - bash
   - curl
