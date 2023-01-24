@@ -4,14 +4,14 @@
     docker_compose_version: v2.15.1
     ansible_python_interpreter: /usr/bin/python3
     apt_packages:
-      - automake
-      - gnome-tweaks
-      - libnss3-tools
-      - libc6-x32
-      - libc6-i386
+      #- automake
+      #- gnome-tweaks
+      #- libnss3-tools
+      #- libc6-x32
+      #- libc6-i386
       - pass
       - pass-extension-tomb
-      - pkg-config
+      #- pkg-config
       - python3
       - python3-gpg
       - python3-pip
