@@ -5,15 +5,12 @@
     ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       - automake
-      - cryptsetup
       - gnome-tweaks
-      - gnupg
       - libnss3-tools
       - libc6-x32
       - libc6-i386
       - pass
       - pass-extension-tomb
-      - pinentry-curses
       - pkg-config
       - python3
       - python3-gpg

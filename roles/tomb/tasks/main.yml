@@ -1,7 +1,14 @@
 - name: Install apt packages
   become: true
   apt:
-    name: make
+    name:
+      - cryptsetup
+      - file
+      - gnupg
+      - make
+      - pinentry-curses
+      - sudo
+      - zsh
     state: latest
     update_cache: yes
 
