@@ -15,7 +15,6 @@
       - python3
       - python3-gpg
       - python3-pip
-      - universal-ctags
   roles:
     - role: geerlingguy.docker
       become: true

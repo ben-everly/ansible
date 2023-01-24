@@ -1,3 +1,10 @@
+- name: Install apt packages
+  become: true
+  apt:
+    name: universal-ctags
+    state: latest
+    update_cache: yes
+
 - name: Check current neovim version.
   shell: nvim --version | head -n 1
   failed_when: false
