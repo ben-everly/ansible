@@ -9,8 +9,6 @@
       #- libnss3-tools
       #- libc6-x32
       #- libc6-i386
-      - pass
-      - pass-extension-tomb
       #- pkg-config
       - python3
       - python3-gpg
@@ -70,6 +68,8 @@
       become: true
     - role: rcm
     - role: tomb
+      become: true
+    - role: pass
       become: true
   tasks:
       - name: apt installs
