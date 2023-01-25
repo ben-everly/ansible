@@ -10,9 +10,6 @@
       #- libc6-x32
       #- libc6-i386
       #- pkg-config
-      - python3
-      - python3-gpg
-      - python3-pip
   roles:
     - role: geerlingguy.docker
       become: true
@@ -23,6 +20,8 @@
     - role: cli-dev-tools
       become: true
     - role: neovim
+    - role: python3
+      become: true
     - role: cimon-io.asdf
       asdf_user: ben
       asdf_group: ben
@@ -72,18 +71,10 @@
     - role: pass
       become: true
   tasks:
-      - name: apt installs
+      - name: apt autoremove
         become: yes
-        block:
-          - name: Install apt packages
-            apt:
-              name: "{{ apt_packages }}"
-              state: latest
-              update_cache: yes
-
-          - name: apt cleanup
-            apt:
-              autoremove: yes
+        apt:
+          autoremove: yes
 
       - name: install javaSE
         block:
