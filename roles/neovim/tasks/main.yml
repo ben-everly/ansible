@@ -17,6 +17,7 @@
   register: neovim
 
 - name: Download nvim deb
+  become: true
   when: >
     nvim_current_version.stdout is defined
     and neovim.json.name|lower not in nvim_current_version.stdout|lower
