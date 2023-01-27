@@ -10,7 +10,7 @@
       #- libc6-i386
       #- pkg-config
   environment:
-    PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims"
+    PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
   roles:
     - role: geerlingguy.docker
       become: true
