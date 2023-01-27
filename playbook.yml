@@ -62,6 +62,7 @@
     - role: dbxcli
     - role: aws
     - role: jet
+    - role: typescript
     - role: pop-shell
     - role: vim-anywhere
     - role: chrome
