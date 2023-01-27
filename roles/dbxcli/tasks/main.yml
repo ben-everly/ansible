@@ -20,6 +20,12 @@
     url: "{{ url }}"
     dest: "{{ filename }}"
 
+- name: ensure directory exists
+  file:
+    path: $HOME/.local/bin
+    recurse: true
+    state: directory
+
 - name: copy executable into path
   copy:
     src: "{{ filename }}"
