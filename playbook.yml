@@ -72,6 +72,8 @@
       become: true
     - role: pass
       become: true
+    - role: vagrant
+      become: true
   tasks:
       - name: apt autoremove
         become: yes
