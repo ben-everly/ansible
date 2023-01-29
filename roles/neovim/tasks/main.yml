@@ -3,7 +3,7 @@
   apt:
     name: universal-ctags
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Check current neovim version.
   shell: nvim --version | head -n 1
@@ -51,7 +51,7 @@
 - name: install node neovim package
   npm:
     name: neovim
-    global: yes
+    global: true
     state: latest
 
 - name: clone php debug client repo

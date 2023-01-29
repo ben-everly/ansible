@@ -3,7 +3,7 @@
   apt:
     name: make
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: clone pop shell repo
   git:

@@ -4,4 +4,4 @@
       - pass
       - pass-extension-tomb
     state: latest
-    update_cache: yes
+    update_cache: true

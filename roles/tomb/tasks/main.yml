@@ -10,7 +10,7 @@
       - sudo
       - zsh
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: download tomb
   get_url:
