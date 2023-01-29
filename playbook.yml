@@ -1,7 +1,6 @@
 - hosts: workstation
   vars:
     docker_compose_version: v2.15.1
-    ansible_python_interpreter: /usr/bin/python3
     apt_packages:
       #- automake
       #- gnome-tweaks
