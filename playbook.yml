@@ -70,7 +70,7 @@
       become: true
       when: "'work' not in ansible_hostname"
   tasks:
-      - name: apt autoremove
-        become: true
-        apt:
-          autoremove: true
+    - name: apt autoremove
+      become: true
+      apt:
+        autoremove: true
