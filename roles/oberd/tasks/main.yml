@@ -9,12 +9,22 @@
     name:
       - slack
 
+- name: make temp dir
+  tempfile:
+    state: directory
+  register: tmp_dir
+
 - name: download zoom deb
   get_url:
     url: https://zoom.us/client/latest/zoom_amd64.deb
-    dest: ./tmp/zoom.deb
+    dest: "{{ tmp_dir.path }}/zoom.deb"
   register: zoom_file
 
 - name: install zoom
   when: zoom_file.changed
-  apt: deb="./tmp/zoom.deb"
+  apt: deb="{{ tmp_dir.path }}/zoom.deb"
+
+- name: remove tmp dir
+  file:
+    path: "{{ tmp_dir.path }}"
+    state: absent
