@@ -1,7 +1,12 @@
+- name: make temp dir
+  tempfile:
+    state: directory
+  register: tmp_dir
+
 - name: download dropbox deb
   get_url:
     url: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
-    dest: ./tmp/dropbox.deb
+    dest: "{{ tmp_dir.path }}/dropbox.deb"
   register: dropbox_file
   retries: 5
   delay: 10
@@ -16,4 +21,9 @@
 
 - name: install dropbox
   when: dropbox_file.changed
-  apt: deb="./tmp/dropbox.deb"
+  apt: deb="{{ tmp_dir.path }}/dropbox.deb"
+
+- name: remove tmp dir
+  file:
+    path: "{{ tmp_dir.path }}"
+    state: absent
