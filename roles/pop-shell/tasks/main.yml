@@ -5,14 +5,24 @@
     state: latest
     update_cache: true
 
+- name: make temp dir
+  tempfile:
+    state: directory
+  register: tmp_dir
+
 - name: clone pop shell repo
   git:
     repo: https://github.com/pop-os/shell.git
-    dest: ./tmp/pop_shell
+    dest: "{{ tmp_dir.path }}/pop_shell"
   register: pop_shell
 
 - name: install pop shell
   when: pop_shell.changed
   make:
-    chdir: ./tmp/pop_shell
+    chdir: "{{ tmp_dir.path }}/pop_shell"
     target: local-install
+
+- name: remove tmp dir
+  file:
+    path: "{{ tmp_dir.path }}"
+    state: absent
