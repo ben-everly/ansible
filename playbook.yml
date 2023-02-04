@@ -41,8 +41,8 @@
           versions: [ "latest:openjdk" ]
           global: "latest"
         - name: ruby
-          versions: [ "3.2" ]
-          global: "3.2"
+          versions: [ "3.2.0" ]
+          global: "3.2.0"
         - name: python
           versions: [ "2.7.18" ]
           global: "2.7.18"
