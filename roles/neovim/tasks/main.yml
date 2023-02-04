@@ -16,7 +16,8 @@
     url: https://api.github.com/repos/neovim/neovim/releases/latest
   register: neovim
 
-- tempfile:
+- name: make temp dir
+  tempfile:
     state: directory
   register: tmp_dir
 
@@ -33,7 +34,8 @@
   become: true
   apt: deb="{{ tmp_dir.path }}/neovim.deb"
 
-- file:
+- name: remove tmp dir
+  file:
     path: "{{ tmp_dir.path }}"
     state: absent
 
