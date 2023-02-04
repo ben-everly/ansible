@@ -16,8 +16,8 @@
     - role: python3
       become: true
     - role: cimon-io.asdf
-      asdf_user: ben
-      asdf_group: ben
+      asdf_user: "{{ ansible_user_id }}"
+      asdf_group: "{{ ansible_user_id }}"
       asdf_apt_optional_dependencies:
        - libsqlite3-dev
        - libgd-dev
