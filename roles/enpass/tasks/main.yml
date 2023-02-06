@@ -2,7 +2,7 @@
   get_url:
     url: https://apt.enpass.io/keys/enpass-linux.key
     dest: /etc/apt/trusted.gpg.d/enpass.asc
-    mode: 644
+    mode: "644"
 
 - name: add enpass apt repository
   apt_repository:
