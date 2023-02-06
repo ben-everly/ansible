@@ -64,16 +64,16 @@
 - name: clone php debug client repo
   git:
     repo: https://github.com/xdebug/vscode-php-debug.git
-    dest: ./local/lib/php-debug-client
+    dest: $HOME/.local/lib/php-debug-client
   register: php_debug_client
 
 - name: install deps for php debug client
   when: php_debug_client.changed
   npm:
-    path: ./local/lib/php-debug-client
+    path: $HOME/.local/lib/php-debug-client
 
 - name: build php debug client
   when: php_debug_client.changed
   args:
-    chdir: ./local/lib/php-debug-client
+    chdir: $HOME/.local/lib/php-debug-client
   command: npm run build
