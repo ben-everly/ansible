@@ -6,7 +6,7 @@
 
 - name: install ecsy
   get_url:
-    url: https://github.com/oberd/ecsy/releases/download/v0.2.15/ecsy-v0.2.15-linux
+    url: https://github.com/oberd/ecsy/releases/download/v0.2.16/ecsy-v0.2.16-linux
     dest: $HOME/.local/bin/ecsy
     mode: "755"
 
