@@ -9,4 +9,4 @@
   unarchive:
     src: ./tmp/jet.tar.gz
     dest: ~/.local/bin
-    mode: 755
+    mode: "755"
