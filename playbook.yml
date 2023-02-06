@@ -8,7 +8,9 @@
       become: true
     - role: enpass
       become: true
-    - role: oberd
+    - role: slack
+      when: "'work' in ansible_hostname"
+    - role: zoom
       when: "'work' in ansible_hostname"
       become: true
     - role: cli-dev-tools

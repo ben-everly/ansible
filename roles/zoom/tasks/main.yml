@@ -1,14 +1,3 @@
-- name: Install snapd
-  apt:
-    name: snapd
-    state: latest
-    update_cache: true
-
-- name: snap installs
-  snap:
-    name:
-      - slack
-
 - name: make temp dir
   tempfile:
     state: directory
@@ -21,7 +10,6 @@
   register: zoom_file
 
 - name: install zoom
-  when: zoom_file.changed
   apt: deb="{{ tmp_dir.path }}/zoom.deb"
 
 - name: remove tmp dir
