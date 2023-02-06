@@ -1,7 +1,9 @@
 - name: Install apt packages
   become: true
   apt:
-    name: make
+    name:
+      - make
+      - gnome
     state: latest
     update_cache: true
 
