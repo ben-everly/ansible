@@ -28,7 +28,7 @@
   get_url:
     url: "{{ neovim|json_query('json.assets[?name == `nvim-linux64.deb`].browser_download_url|[0]') }}"
     dest: "{{ tmp_dir.path }}/neovim.deb"
-    mode: 755
+    mode: "755"
 
 - name: install neovim
   become: true
