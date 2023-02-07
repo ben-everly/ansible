@@ -2,6 +2,8 @@
 - name: check for ecsy command
   shell:
     cmd: which ecsy
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 127
   register: result
 
 - name: install ecsy
