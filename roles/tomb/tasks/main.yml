@@ -1,6 +1,8 @@
 - name: check if tomb is installed
   shell:
     cmd: tomb -v 2>&1 | head -1
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 127
   register: result
 
 - name: install tomb
