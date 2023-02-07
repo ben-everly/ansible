@@ -1,13 +1,31 @@
-#todo use tempfile
-- name: download jet
-  get_url:
-    url: https://s3.amazonaws.com/codeship-jet-releases/2.14.0/jet-linux_amd64_2.14.0.tar.gz
-    dest: ./tmp/jet.tar.gz
-  register: jet_file
+- name: check if jet is installed
+  shell:
+    cmd: jet version
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 127
+  register: result
 
-- name: unzip jet
-  when: jet_file.changed
-  unarchive:
-    src: ./tmp/jet.tar.gz
-    dest: ~/.local/bin
-    mode: "755"
+- name: install jet
+  when: "'command not found' in result.stdout"
+  block:
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: download jet
+      get_url:
+        url: https://s3.amazonaws.com/codeship-jet-releases/2.14.0/jet-linux_amd64_2.14.0.tar.gz
+        dest: "{{ tmp_dir.path }}/jet.tar.gz"
+      register: jet_file
+
+    - name: unzip jet
+      unarchive:
+        src: "{{ tmp_dir.path }}/jet.tar.gz"
+        dest: $HOME/.local/bin
+        mode: "755"
+
+    - name: remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
