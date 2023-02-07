@@ -1,6 +1,8 @@
 - name: check if dropbox is installed
   shell:
     cmd: dropbox version 2>&1 | head -1
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 127
   register: result
 
 - name: install dropbox
