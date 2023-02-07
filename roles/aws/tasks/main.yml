@@ -1,19 +1,21 @@
 #todo check if ecsy is installed first
-- name: ensure directory exists
-  file:
-    path: $HOME/.local/bin
-    recurse: true
-    state: directory
+- name: check for ecsy command
+  shell:
+    cmd: which ecsy
+  register: result
 
 - name: install ecsy
-  get_url:
-    url: https://github.com/oberd/ecsy/releases/download/v0.2.16/ecsy-v0.2.16-linux
-    dest: $HOME/.local/bin/ecsy
-    mode: "755"
+  when: result.stdout == ''
+  block:
+    - name: install ecsy
+      get_url:
+        url: https://github.com/oberd/ecsy/releases/download/v0.2.16/ecsy-v0.2.16-linux
+        dest: $HOME/.local/bin/ecsy
+        mode: "755"
 
-- name: Install apt packages
-  become: true
-  apt:
-    name: awscli
-    state: latest
-    update_cache: true
+    - name: Install apt packages
+      become: true
+      apt:
+        name: awscli
+        state: latest
+        update_cache: true
