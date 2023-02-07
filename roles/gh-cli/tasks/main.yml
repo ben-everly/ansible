@@ -1,26 +1,45 @@
-#todo use tempfile
-- name: find latest release of gh cli
-  uri:
-    url: https://api.github.com/repos/cli/cli/releases/latest
-  register: download
+- name: check if gh command exists
+  shell:
+    cmd: gh --version | head -1
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 127
+  register: result
 
-- set_fact:
-    asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
-- set_fact:
-    filename: "./tmp/{{ asset.name }}"
-    url: "{{ asset.browser_download_url }}"
+- name: install gh cli
+  when: "'command not found' in result.stdout"
+  block:
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
 
-- name: check if latest version of gh cli is already downloaded
-  stat:
-    path: "{{ filename }}"
-  register: version
+    - name: find latest release of gh cli
+      uri:
+        url: https://api.github.com/repos/cli/cli/releases/latest
+      register: download
 
-- name: download latest version of gh cli
-  when: not version.stat.exists
-  get_url:
-    url: "{{ url }}"
-    dest: "{{ filename }}"
+    - set_fact:
+        asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
+    - set_fact:
+        filename: "{{ tmp_dir.path }}/{{ asset.name }}"
+        url: "{{ asset.browser_download_url }}"
 
-- name: install latest version of gh cli
-  when: not version.stat.exists
-  apt: deb="{{ filename }}"
+    - name: check if latest version of gh cli is already downloaded
+      stat:
+        path: "{{ filename }}"
+      register: version
+
+    - name: download latest version of gh cli
+      when: not version.stat.exists
+      get_url:
+        url: "{{ url }}"
+        dest: "{{ filename }}"
+
+    - name: install latest version of gh cli
+      when: not version.stat.exists
+      apt: deb="{{ filename }}"
+
+    - name: remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
