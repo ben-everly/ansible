@@ -1,4 +1,3 @@
-#todo check if ecsy is installed first
 - name: check for ecsy command
   shell:
     cmd: which ecsy
