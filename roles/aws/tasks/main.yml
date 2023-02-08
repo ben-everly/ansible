@@ -1,22 +1,14 @@
-- name: check for ecsy command
-  shell:
-    cmd: which ecsy
-  changed_when: false
-  failed_when: result.rc != 0 and result.rc != 1
-  register: result
+- name: find latest release of ecsy
+  uri:
+    url: https://api.github.com/repos/oberd/ecsy/releases/latest
+  register: download
 
-- name: install ecsy
-  when: result.rc == 1
-  block:
-    - name: install ecsy
-      get_url:
-        url: https://github.com/oberd/ecsy/releases/download/v0.2.16/ecsy-v0.2.16-linux
-        dest: $HOME/.local/bin/ecsy
-        mode: "755"
+- set_fact:
+    asset: "{{ download.json.assets | select('match', '.*linux') | first }}"
 
-    - name: install awscli package
-      become: true
-      apt:
-        name: awscli
-        state: latest
-        update_cache: true
+- name: download latest version of ecsy
+  get_url:
+    url: "{{ asset.browser_download_url }}"
+    dest: $HOME/.local/bin/ecsy
+    mode: "755"
+    force: true
