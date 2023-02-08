@@ -55,8 +55,6 @@
       become: true
     - role: gh-cli
       become: true
-    - role: dbxcli
-    - role: aws
     - role: jet
     - role: typescript
     - role: pop-shell
@@ -71,6 +69,8 @@
     - role: vagrant
       become: true
       when: "'work' not in ansible_hostname"
+    - role: dbxcli
+    - role: aws
   tasks:
     - name: apt autoremove
       become: true
