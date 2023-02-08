@@ -2,11 +2,11 @@
   shell:
     cmd: which ecsy
   changed_when: false
-  failed_when: result.rc != 0 and result.rc != 127
+  failed_when: result.rc != 0 and result.rc != 1
   register: result
 
 - name: install ecsy
-  when: result.stdout == ''
+  when: result.rc == 1
   block:
     - name: install ecsy
       get_url:
@@ -14,7 +14,7 @@
         dest: $HOME/.local/bin/ecsy
         mode: "755"
 
-    - name: Install apt packages
+    - name: install awscli package
       become: true
       apt:
         name: awscli
