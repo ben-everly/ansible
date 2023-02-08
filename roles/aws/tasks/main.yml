@@ -6,6 +6,12 @@
 - set_fact:
     asset: "{{ download.json.assets | select('match', '.*linux') | first }}"
 
+# get_url requires directory to exist
+- name: ensure install directory exists
+  file:
+    state: directory
+    path: $HOME/.local/bin
+
 - name: download latest version of ecsy
   get_url:
     url: "{{ asset.browser_download_url }}"
