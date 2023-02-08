@@ -1,11 +1,24 @@
-#todo use tempfile
-#todo check if chrome is installed first
-- name: download chrome
-  get_url:
-    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    dest: ./tmp/chrome.deb
-  register: chrome_file
+- name: check if chrome is installed
+  shell:
+    cmd: which google-chrome
+  changed_when: false
+  failed_when: result.rc != 0 and result.rc != 1
+  register: result
 
 - name: install chrome
-  when: chrome_file.changed
-  apt: deb="./tmp/chrome.deb"
+  when: result.rc == 1
+  block:
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: download chrome
+      get_url:
+        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dest: "{{ tmp_dir.path }}/chrome.deb"
+      register: chrome_file
+
+    - name: install chrome
+      when: chrome_file.changed
+      apt: 'deb="{{ tmp_dir.path }}/chrome.deb"'
