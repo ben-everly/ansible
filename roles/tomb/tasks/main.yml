@@ -1,12 +1,12 @@
 - name: check if tomb is installed
   shell:
-    cmd: tomb -v 2>&1 | head -1
+    cmd: which tomb
   changed_when: false
-  failed_when: result.rc != 0 and result.rc != 127
+  failed_when: result.rc != 0 and result.rc != 1
   register: result
 
 - name: install tomb
-  when: "'command not found' in result.stdout"
+  when: result.rc == 1
   block:
     - name: Install apt packages
       become: true
