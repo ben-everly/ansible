@@ -1,14 +1,24 @@
 - name: Install apt packages
+  become: true
   apt:
     name: "{{ cli_apt_packages }}"
     state: latest
     update_cache: true
 
 - name: set default shell
+  when: ansible_env.SHELL != '/usr/bin/zsh'
   shell:
     cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
 
+- name: query current terminal emulator
+  shell:
+    cmd: |
+      update-alternatives --query x-terminal-emulator | grep Value: | awk '{print $2}'
+  register: term
+  changed_when: false
+
 - name: set alternatives
+  when: term.stdout != '/usr/bin/kitty'
   shell:
     cmd: |
       update-alternatives --set x-terminal-emulator /usr/bin/kitty
