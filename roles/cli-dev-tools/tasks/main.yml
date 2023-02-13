@@ -19,9 +19,11 @@
     cmd: |
       update-alternatives --query x-terminal-emulator | grep Value: | awk '{print $2}'
   register: term
+  become: true
   changed_when: false
 
 - name: set alternatives
+  become: true
   when: term.stdout != '/usr/bin/kitty'
   shell:
     cmd: |
