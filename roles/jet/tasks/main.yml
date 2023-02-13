@@ -19,6 +19,12 @@
         dest: "{{ tmp_dir.path }}/jet.tar.gz"
       register: jet_file
 
+    # unzip requires path to exist
+    - name: ensure install directory exists
+      file:
+        state: directory
+        path: $HOME/.local/bin
+
     - name: unzip jet
       unarchive:
         src: "{{ tmp_dir.path }}/jet.tar.gz"
