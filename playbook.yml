@@ -14,7 +14,6 @@
     - role: zoom
       when: "'work' in ansible_hostname"
       become: true
-    - role: cli-dev-tools
     - role: python3
       become: true
     - role: cimon-io.asdf
@@ -58,6 +57,7 @@
     - role: jet
     - role: typescript
     - role: pop-shell
+    - role: cli-dev-tools
     - role: vim-anywhere
     - role: chrome
       become: true
