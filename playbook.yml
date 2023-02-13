@@ -9,6 +9,7 @@
     - role: enpass
       become: true
     - role: slack
+      become: true
       when: "'work' in ansible_hostname"
     - role: zoom
       when: "'work' in ansible_hostname"
