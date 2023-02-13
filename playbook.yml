@@ -12,8 +12,8 @@
       become: true
       when: "'work' in ansible_hostname"
     - role: zoom
-      when: "'work' in ansible_hostname"
       become: true
+      when: "'work' in ansible_hostname"
     - role: python3
       become: true
     - role: cimon-io.asdf
