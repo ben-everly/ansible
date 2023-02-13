@@ -5,8 +5,12 @@
     state: latest
     update_cache: true
 
+- set_fact:
+    shell: "{{ ansible_env.SHELL }}"
+
 - name: set default shell
-  when: ansible_env.SHELL != '/usr/bin/zsh'
+  become: true
+  when: shell != '/usr/bin/zsh'
   shell:
     cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
 
