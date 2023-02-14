@@ -5,11 +5,11 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
 
   config.vm.define "personal" do |personal|
-    config.vm.hostname = "test"
+    personal.vm.hostname = "test"
   end
 
   config.vm.define "work" do |work|
-    config.vm.hostname = "work"
+    work.vm.hostname = "work"
   end
 
   # Share an additional folder to the guest VM. The first argument is
