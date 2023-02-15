@@ -1,11 +1,14 @@
-- hosts: workstation
+- hosts: all
   vars:
     docker_compose_version: v2.15.1
-  environment:
-    PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
   roles:
     - role: geerlingguy.docker
       become: true
+
+- hosts: workstation
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
+  roles:
     - role: enpass
       become: true
     - role: slack
