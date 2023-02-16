@@ -79,3 +79,11 @@
       become: true
       apt:
         autoremove: true
+
+- hosts: server
+  become: true
+  tasks:
+    - name: clone docker-compose repo
+      git:
+        repo: https://github.com/ben-everly/server-containers
+        dest: /srv/docker
