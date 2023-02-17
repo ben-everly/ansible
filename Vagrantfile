@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
     server.vm.box = "debian/bullseye64"
     server.vm.provision "ansible" do |ansible|
       ansible.galaxy_role_file = "./roles/requirements.yml"
-      ansible.galaxy_roles_path = "../roles"
+      ansible.galaxy_roles_path = "../../roles"
       ansible.limit = "server"
       ansible.playbook = "playbook.yml"
     end
