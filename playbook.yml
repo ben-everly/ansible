@@ -89,3 +89,8 @@
       git:
         repo: https://github.com/ben-everly/server-containers
         dest: /srv/docker
+
+    - name: start containers
+      shell:
+        cmd: "docker-compose up -d"
+        chdir: /srv/docker
