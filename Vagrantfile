@@ -29,6 +29,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "server" do |server|
     server.vm.box = "debian/bullseye64"
+    server.vm.network "private_network", ip: "192.168.56.2"
     server.vm.provision "ansible" do |ansible|
       ansible.galaxy_role_file = "./roles/requirements.yml"
       ansible.galaxy_roles_path = "../../roles"
