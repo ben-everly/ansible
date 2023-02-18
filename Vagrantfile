@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
     server.vm.network "private_network", ip: "192.168.56.2"
     server.vm.provision "ansible" do |ansible|
       ansible.galaxy_role_file = "./roles/requirements.yml"
-      ansible.galaxy_roles_path = "../../roles"
+      ansible.galaxy_roles_path = "/$HOME/.ansible/roles"
       ansible.limit = "server"
       ansible.playbook = "playbook.yml"
     end
