@@ -1,1 +1,1 @@
-My development setup. Currently supports debian 10.
+Ansible plays to set up a local developement environment on ubuntu 22.04 and a debian server running docker
