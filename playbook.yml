@@ -78,6 +78,8 @@
     - role: aws
     - role: bottom
       become: true
+    - role: newsboat
+      become: true
   tasks:
     - name: apt autoremove
       become: true

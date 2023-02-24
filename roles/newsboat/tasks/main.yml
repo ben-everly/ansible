@@ -1,0 +1,5 @@
+- name: Install apt packages
+  apt:
+    name: newsboat
+    state: latest
+    update_cache: true
