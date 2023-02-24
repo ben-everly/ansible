@@ -76,6 +76,8 @@
       when: "'work' not in ansible_hostname"
     - role: dbxcli
     - role: aws
+    - role: bottom
+      become: true
   tasks:
     - name: apt autoremove
       become: true
