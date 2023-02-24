@@ -17,8 +17,6 @@
       get_url:
         url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         dest: "{{ tmp_dir.path }}/chrome.deb"
-      register: chrome_file
 
     - name: install chrome
-      when: chrome_file.changed
       apt: 'deb="{{ tmp_dir.path }}/chrome.deb"'
