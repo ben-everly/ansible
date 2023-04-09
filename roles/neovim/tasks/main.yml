@@ -5,20 +5,39 @@
     state: latest
     update_cache: true
 
-- name: install nvim
-  become: true
-  block:
-    - name: add neovim apt repository
-      apt_repository:
-        repo: ppa:neovim-ppa/stable
-        state: present
-        filename: neovim
+- name: Check current neovim version.
+  shell: nvim --version 2>&1 | head -n 1
+  failed_when: false
+  changed_when: false
+  register: nvim_current_version
 
-    - name: Install apt packages
-      apt:
-        name: neovim
-        state: latest
-        update_cache: true
+- name: Check latest version of neovim
+  uri:
+    url: https://api.github.com/repos/neovim/neovim/releases/latest
+  register: neovim
+
+- name: install nvim
+  when: nvim_current_version.stdout|lower not in neovim.json.body|lower
+  block:
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: Download nvim deb
+      get_url:
+        url: "{{ neovim|json_query('json.assets[?name == `nvim-linux64.deb`].browser_download_url|[0]') }}"
+        dest: "{{ tmp_dir.path }}/neovim.deb"
+        mode: "755"
+
+    - name: install neovim
+      become: true
+      apt: deb="{{ tmp_dir.path }}/neovim.deb"
+
+    - name: remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
 
 - name: install pip packages
   pip:
