@@ -52,6 +52,10 @@
         - name: python
           versions: [ "2.7.18" ]
           global: "2.7.18"
+        - name: perl
+          repository: https://github.com/ouest/asdf-perl.git
+          versions: [ "5.38.0" ]
+          global: "5.38.0"
     - role: neovim
     - role: spotify
       become: true
