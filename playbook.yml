@@ -59,6 +59,11 @@
         - name: rust
           repository: https://github.com/asdf-community/asdf-rust.git
           versions: [ "1.71.0" ]
+          global: "1.71.0"
+        - name: lua
+          repository: https://github.com/Stratus3D/asdf-lua.git
+          versions: [ "5.4.6" ]
+          global: "5.4.6"
     - role: neovim
     - role: spotify
       become: true
