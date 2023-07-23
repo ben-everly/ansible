@@ -43,9 +43,13 @@
 
 - name: install node neovim package
   npm:
-    name: neovim
+    name: "{{ item }}"
     global: true
     state: latest
+  with_items:
+    - neovim
+    - yarn
+    - treesitter
 
 - name: install cpan packages
   cpanm:
