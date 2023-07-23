@@ -49,7 +49,7 @@
   with_items:
     - neovim
     - yarn
-    - treesitter
+    - tree-sitter-cli
 
 - name: install cpan packages
   cpanm:
