@@ -47,6 +47,13 @@
     global: true
     state: latest
 
+- name: install cpan packages
+  cpanm:
+    name: >
+      Neovim::Ext
+      App::cpanminus
+    notest: true
+
 - name: clone php debug client repo
   git:
     repo: https://github.com/xdebug/vscode-php-debug.git
