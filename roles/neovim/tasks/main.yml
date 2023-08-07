@@ -53,10 +53,11 @@
 
 - name: install cpan packages
   cpanm:
-    name: >
-      Neovim::Ext
-      App::cpanminus
+    name: "{{ item }}"
     notest: true
+  with_items:
+    - Neovim::Ext
+    - App::cpanminus
 
 - name: clone php debug client repo
   git:
