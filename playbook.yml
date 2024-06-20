@@ -71,8 +71,6 @@
     - role: neovim
     - role: spotify
       become: true
-    - role: dropbox
-      become: true
     - role: gh-cli
       become: true
     - role: jet
@@ -90,7 +88,6 @@
     - role: vagrant
       become: true
       when: "'work' not in ansible_hostname"
-    - role: dbxcli
     - role: aws
     - role: bottom
       become: true
