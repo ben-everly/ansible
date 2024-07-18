@@ -1,0 +1,10 @@
+- name: Install snapd
+  apt:
+    name: snapd
+    state: latest
+    update_cache: true
+
+- name: snap installs
+  snap:
+    name:
+      - postman
