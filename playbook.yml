@@ -62,8 +62,8 @@
           global: "1.71.0"
         - name: lua
           repository: https://github.com/Stratus3D/asdf-lua.git
-          versions: [ "5.4.6" ]
-          global: "5.4.6"
+          versions: [ "5.4.6", "5.1" ]
+          global: "5.1"
         - name: julia
           repository: https://github.com/rkyleg/asdf-julia.git
           versions: [ "1.9.2" ]
