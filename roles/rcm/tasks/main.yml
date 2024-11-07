@@ -5,6 +5,7 @@
       - rcm
       - dconf-editor
       - fonts-firacode
+      - playerctl
     state: latest
     update_cache: true
 
