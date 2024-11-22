@@ -93,6 +93,8 @@
       become: true
     - role: newsboat
       become: true
+    - role: calibre
+      become: true
     - role: zoxide
       become: true
   tasks:
