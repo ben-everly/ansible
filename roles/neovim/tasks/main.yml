@@ -20,7 +20,7 @@
 
 - name: Download nvim appimage
   get_url:
-    url: "{{ neovim|json_query('json.assets[?name == `nvim.appimage`].browser_download_url|[0]') }}"
+    url: "{{ neovim|json_query('json.assets[?name == `nvim-linux-x86_64.appimage`].browser_download_url|[0]') }}"
     dest: $HOME/.local/bin/nvim
     mode: "755"
   when: nvim_current_version.stdout|lower not in neovim.json.body|lower
