@@ -37,8 +37,8 @@
           versions: [ "1.20.6" ]
           global: "1.20.6"
         - name: nodejs
-          versions: [ "20.5.0" ]
-          global: "20.5.0"
+          versions: [ "23.6.1" ]
+          global: "23.6.1"
         - name: php
           versions: [ "8.2.8" ]
           global: "8.2.8"
