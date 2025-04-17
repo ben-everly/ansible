@@ -29,23 +29,26 @@
   pip:
     name: pynvim
     state: latest
+    executable: $HOME/.asdf/shims/pip
 
 - name: install pip2 packages
   pip:
     name: pynvim
     state: latest
-    executable: pip2
+    executable: $HOME/.asdf/shims/pip2
 
 - name: install ruby packages
   gem:
     name: neovim
     state: latest
+    executable: $HOME/.asdf/shims/gem
 
 - name: install node neovim package
   npm:
     name: "{{ item }}"
     global: true
     state: latest
+    executable: $HOME/.asdf/shims/npm
   with_items:
     - neovim
     - yarn
@@ -55,6 +58,7 @@
   cpanm:
     name: "{{ item }}"
     notest: true
+    executable: $HOME/.asdf/shims/cpanm
   with_items:
     - Neovim::Ext
     - App::cpanminus

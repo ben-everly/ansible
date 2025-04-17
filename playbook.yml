@@ -19,8 +19,6 @@
     - role: zoom
       become: true
       when: "'work' in ansible_hostname"
-    - role: python3
-      become: true
     - role: cimon-io.asdf
       asdf_user: "{{ ansible_user_id }}"
       asdf_group: "{{ ansible_user_id }}"
@@ -50,8 +48,8 @@
           versions: [ "3.2.0" ]
           global: "3.2.0"
         - name: python
-          versions: [ "2.7.18" ]
-          global: "2.7.18"
+          versions: [ "2.7.18", "3.13.3" ]
+          global: "3.13.3 2.7.18"
         - name: perl
           repository: https://github.com/ouest/asdf-perl.git
           versions: [ "5.38.0" ]
