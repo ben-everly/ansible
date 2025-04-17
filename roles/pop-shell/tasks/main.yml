@@ -10,6 +10,7 @@
 - name: clone pop shell repo
   git:
     repo: https://github.com/pop-os/shell.git
+    version: master_noble
     dest: $HOME/.local/src/pop_shell
   register: pop_shell
 
