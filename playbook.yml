@@ -23,7 +23,7 @@
       asdf_user: "{{ ansible_user_id }}"
       asdf_group: "{{ ansible_user_id }}"
       asdf_apt_optional_dependencies:
-        # php 8.2.2
+        # php 8.4.6
         - libsqlite3-dev
         - libgd-dev
         - libonig-dev
@@ -38,8 +38,8 @@
           versions: [ "23.6.1" ]
           global: "23.6.1"
         - name: php
-          versions: [ "8.2.8" ]
-          global: "8.2.8"
+          versions: [ "8.4.6" ]
+          global: "8.4.6"
         - name: java
           repository: https://github.com/halcyon/asdf-java.git
           versions: [ "openjdk-20.0.2" ]
