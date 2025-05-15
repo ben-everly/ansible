@@ -18,3 +18,10 @@
     dest: $HOME/.local/bin/ecsy
     mode: "755"
     force: true
+
+- name: install aws-cli
+  become: true
+  snap:
+    name: aws-cli
+    classic: true
+    state: present
