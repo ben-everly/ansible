@@ -87,6 +87,7 @@
       become: true
       when: "'work' not in ansible_hostname"
     - role: aws
+      become: true
     - role: bottom
       become: true
     - role: newsboat
@@ -94,6 +95,8 @@
     - role: calibre
       become: true
     - role: zoxide
+      become: true
+    - role: postman
       become: true
   tasks:
     - name: apt update

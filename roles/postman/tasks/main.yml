@@ -4,7 +4,7 @@
     state: latest
     update_cache: true
 
-- name: snap installs
+- name: install postman
   snap:
     name:
       - postman

@@ -1,28 +1,10 @@
-- name: check if zoom is installed
-  shell:
-    cmd: which zoom
-  changed_when: false
-  failed_when: result.rc != 0 and result.rc != 1
-  register: result
+- name: Install snapd
+  apt:
+    name: snapd
+    state: latest
+    update_cache: true
 
 - name: install zoom
-  when: result.rc == 1
-  block:
-    - name: make temp dir
-      tempfile:
-        state: directory
-      register: tmp_dir
-
-    - name: download zoom deb
-      get_url:
-        url: https://zoom.us/client/latest/zoom_amd64.deb
-        dest: "{{ tmp_dir.path }}/zoom.deb"
-      register: zoom_file
-
-    - name: install zoom
-      apt: deb="{{ tmp_dir.path }}/zoom.deb"
-
-    - name: remove tmp dir
-      file:
-        path: "{{ tmp_dir.path }}"
-        state: absent
+  snap:
+    name:
+      - zoom-client
