@@ -96,6 +96,7 @@
       become: true
     - role: zoxide
       become: true
+    - role: pulumi
     - role: postman
       become: true
   tasks:
