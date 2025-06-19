@@ -99,6 +99,8 @@
     - role: pulumi
     - role: postman
       become: true
+    - role: wezterm
+      become: true
   tasks:
     - name: apt update
       become: true

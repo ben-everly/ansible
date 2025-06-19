@@ -1,0 +1,17 @@
+- name: add wezterm signing key
+  get_url:
+    url: https://apt.fury.io/wez/gpg.key
+    dest: /etc/apt/trusted.gpg.d/wezterm.asc
+    mode: "644"
+
+- name: add wezterm apt repository
+  apt_repository:
+    repo: deb https://apt.fury.io/wez/ * *
+    state: present
+    filename: wezterm
+
+- name: Install apt packages
+  apt:
+    name: wezterm
+    state: latest
+    update_cache: true
