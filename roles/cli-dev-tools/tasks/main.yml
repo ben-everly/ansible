@@ -24,7 +24,7 @@
 
 - name: set alternatives
   become: true
-  when: term.stdout != '/usr/bin/wezterm'
+  when: term.stdout != '/usr/bin/open-wezterm-here'
   shell:
     cmd: |
-      update-alternatives --set x-terminal-emulator /usr/bin/wezterm
+      update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
