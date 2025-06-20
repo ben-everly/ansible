@@ -11,6 +11,12 @@
   environment:
     PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
   roles:
+    - role: nerd-fonts
+      fonts:
+        - "FiraCode"
+        - "JetBrainsMono"
+        - "SourceCodePro"
+        - "UbuntuMono"
     - role: enpass
       become: true
     - role: slack
