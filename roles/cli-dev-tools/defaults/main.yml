@@ -1,5 +1,6 @@
 cli_apt_packages:
     - bash
+    - cmake
     - curl
     - eza
     - fd-find
