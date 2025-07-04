@@ -1,21 +1,21 @@
 - name: Install apt packages
   become: true
   apt:
-    name:
-      - make
-      - gnome
-    state: latest
-    update_cache: true
+      name:
+          - make
+          - gnome
+      state: latest
+      update_cache: true
 
 - name: clone pop shell repo
   git:
-    repo: https://github.com/pop-os/shell.git
-    version: master_noble
-    dest: $HOME/.local/src/pop_shell
+      repo: https://github.com/pop-os/shell.git
+      version: master_noble
+      dest: $HOME/.local/src/pop_shell
   register: pop_shell
 
 - name: install pop shell
   when: pop_shell.changed
   make:
-    chdir: $HOME/.local/src/pop_shell
-    target: local-install
+      chdir: $HOME/.local/src/pop_shell
+      target: local-install

@@ -1,23 +1,23 @@
 - name: Install apt packages
   become: true
   apt:
-    name: "{{ cli_apt_packages }}"
-    state: latest
-    update_cache: true
+      name: "{{ cli_apt_packages }}"
+      state: latest
+      update_cache: true
 
 - set_fact:
-    shell: "{{ ansible_env.SHELL }}"
+      shell: "{{ ansible_env.SHELL }}"
 
 - name: set default shell
   become: true
   when: shell != '/usr/bin/zsh'
   shell:
-    cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
+      cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
 
 - name: query current terminal emulator
   shell:
-    cmd: |
-      update-alternatives --query x-terminal-emulator | grep Value: | awk '{print $2}'
+      cmd: |
+          update-alternatives --query x-terminal-emulator | grep Value: | awk '{print $2}'
   register: term
   become: true
   changed_when: false
@@ -26,5 +26,5 @@
   become: true
   when: term.stdout != '/usr/bin/open-wezterm-here'
   shell:
-    cmd: |
-      update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
+      cmd: |
+          update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here

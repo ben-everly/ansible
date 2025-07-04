@@ -1,6 +1,6 @@
 - name: check if bottom is installed
   shell:
-    cmd: which btm
+      cmd: which btm
   changed_when: false
   failed_when: result.rc != 0 and result.rc != 1
   register: result
@@ -8,15 +8,15 @@
 - name: install bottom
   when: result.rc == 1
   block:
-    - name: make temp dir
-      tempfile:
-        state: directory
-      register: tmp_dir
+      - name: make temp dir
+        tempfile:
+            state: directory
+        register: tmp_dir
 
-    - name: download bottom
-      get_url:
-        url: https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
-        dest: "{{ tmp_dir.path }}/bottom.deb"
+      - name: download bottom
+        get_url:
+            url: https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
+            dest: "{{ tmp_dir.path }}/bottom.deb"
 
-    - name: install bottom
-      apt: 'deb="{{ tmp_dir.path }}/bottom.deb"'
+      - name: install bottom
+        apt: 'deb="{{ tmp_dir.path }}/bottom.deb"'

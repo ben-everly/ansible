@@ -1,18 +1,18 @@
 - name: Install apt packages
   become: true
   apt:
-    name:
-      - rcm
-      - dconf-editor
-      - fonts-firacode
-      - playerctl
-    state: latest
-    update_cache: true
+      name:
+          - rcm
+          - dconf-editor
+          - fonts-firacode
+          - playerctl
+      state: latest
+      update_cache: true
 
 - name: clone dotfiles repo
   git:
-    repo: https://github.com/ben-everly/dotfiles
-    dest: $HOME/.dotfiles
+      repo: https://github.com/ben-everly/dotfiles
+      dest: $HOME/.dotfiles
   register: dotfiles
 
 - name: update dotfiles

@@ -1,33 +1,33 @@
 - name: find latest release of ecsy
   uri:
-    url: https://api.github.com/repos/oberd/ecsy/releases/latest
+      url: https://api.github.com/repos/oberd/ecsy/releases/latest
   register: download
 
 - set_fact:
-    asset: "{{ download.json.assets | select('match', '.*linux') | first }}"
+      asset: "{{ download.json.assets | select('match', '.*linux') | first }}"
 
 # get_url requires directory to exist
 - name: ensure install directory exists
   file:
-    state: directory
-    path: $HOME/.local/bin
+      state: directory
+      path: $HOME/.local/bin
 
 - name: download latest version of ecsy
   get_url:
-    url: "{{ asset.browser_download_url }}"
-    dest: $HOME/.local/bin/ecsy
-    mode: "755"
-    force: true
+      url: "{{ asset.browser_download_url }}"
+      dest: $HOME/.local/bin/ecsy
+      mode: "755"
+      force: true
 
 - name: Install snapd
   apt:
-    name: snapd
-    state: latest
-    update_cache: true
+      name: snapd
+      state: latest
+      update_cache: true
 
 - name: install aws-cli
   become: true
   snap:
-    name: aws-cli
-    classic: true
-    state: present
+      name: aws-cli
+      classic: true
+      state: present

@@ -1,44 +1,44 @@
 - name: create directory for {{ font }}
   file:
-    path: '{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}'
-    mode: 0775
-    state: directory
+      path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+      mode: 0775
+      state: directory
 
 - name: github api version check for {{ font }}
   uri:
-    url: "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
-    return_content: true
+      url: "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
+      return_content: true
   register: latest_version
 
 - name: reset current version to '0.0.0'
   set_fact:
-    current_version: '0.0.0'
+      current_version: "0.0.0"
 
 - name: read current version file for {{ font }}
   slurp:
-    src: '{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt'
+      src: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
   register: current_version_file_content
   ignore_errors: true
 
 - name: set current version for {{ font }}
   set_fact:
-    current_version: "{{ current_version_file_content.content | b64decode | trim }}"
+      current_version: "{{ current_version_file_content.content | b64decode | trim }}"
   when: current_version_file_content is defined and current_version_file_content.content is defined
 
 - name: debug current version for {{ font }}
   debug:
-    msg: "Current version of {{ font }} is {{ current_version }}"
+      msg: "Current version of {{ font }} is {{ current_version }}"
 
 - name: download and extract {{ font }}
   ansible.builtin.unarchive:
-    src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/{{ font }}.tar.xz"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
-    remote_src: true
+      src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/{{ font }}.tar.xz"
+      dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+      remote_src: true
   when: latest_version.json.tag_name != current_version
 
 - name: write latest version to file for {{ font }}
   copy:
-    content: "{{ latest_version.json.tag_name }}"
-    dest: '{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt'
-    mode: '0644'
+      content: "{{ latest_version.json.tag_name }}"
+      dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
+      mode: "0644"
   when: latest_version.json.tag_name != current_version
