@@ -109,6 +109,7 @@
         become: true
       - role: wezterm
         become: true
+      - role: opencode
   tasks:
       - name: apt update
         become: true

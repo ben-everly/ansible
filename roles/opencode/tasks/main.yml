@@ -1,0 +1,4 @@
+- name: Install OpenCode AI Agent
+  ansible.builtin.shell:
+      cmd: "curl -fsSL https://opencode.ai/install | bash"
+      creates: ~/.opencode/bin/opencode
