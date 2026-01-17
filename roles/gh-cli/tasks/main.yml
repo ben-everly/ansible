@@ -36,3 +36,28 @@
         file:
             path: "{{ tmp_dir.path }}"
             state: absent
+
+- name: check installed gh extensions
+  shell: gh extension list
+  register: gh_extensions
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: get latest gh-act release tag
+  uri:
+      url: https://api.github.com/repos/nektos/gh-act/releases/latest
+  register: gh_act_release
+  become: false
+
+- name: install gh-act extension
+  shell: gh extension install nektos/gh-act
+  when: "'nektos/gh-act' not in gh_extensions.stdout"
+  become: false
+
+- name: update gh-act extension
+  shell: gh extension upgrade act
+  when:
+      - "'nektos/gh-act' in gh_extensions.stdout"
+      - "gh_act_release.json.tag_name not in gh_extensions.stdout"
+  become: false
