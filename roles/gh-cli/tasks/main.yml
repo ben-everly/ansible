@@ -3,42 +3,42 @@
   register: version
 
 - set_fact:
-      version: "v{{ version.stdout }}"
+    version: "v{{ version.stdout }}"
 
 - name: find latest release of gh cli
   uri:
-      url: https://api.github.com/repos/cli/cli/releases/latest
+    url: https://api.github.com/repos/cli/cli/releases/latest
   register: download
 
 - name: install gh cli
   when: version != download.json.tag_name
   block:
-      - name: make temp dir
-        tempfile:
-            state: directory
-        register: tmp_dir
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
 
-      - set_fact:
-            asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
-      - set_fact:
-            filename: "{{ tmp_dir.path }}/{{ asset.name }}"
-            url: "{{ asset.browser_download_url }}"
+    - set_fact:
+        asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
+    - set_fact:
+        filename: "{{ tmp_dir.path }}/{{ asset.name }}"
+        url: "{{ asset.browser_download_url }}"
 
-      - name: download latest version of gh cli
-        get_url:
-            url: "{{ url }}"
-            dest: "{{ filename }}"
+    - name: download latest version of gh cli
+      get_url:
+        url: "{{ url }}"
+        dest: "{{ filename }}"
 
-      - name: install latest version of gh cli
-        apt: deb="{{ filename }}"
+    - name: install latest version of gh cli
+      apt: deb="{{ filename }}"
 
-      - name: remove tmp dir
-        file:
-            path: "{{ tmp_dir.path }}"
-            state: absent
+    - name: remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
 
 - name: check installed gh extensions
-  shell: gh extension list
+  shell: gh extension list | grep act
   register: gh_extensions
   changed_when: false
   failed_when: false
@@ -46,7 +46,7 @@
 
 - name: get latest gh-act release tag
   uri:
-      url: https://api.github.com/repos/nektos/gh-act/releases/latest
+    url: https://api.github.com/repos/nektos/gh-act/releases/latest
   register: gh_act_release
   become: false
 
@@ -58,6 +58,6 @@
 - name: update gh-act extension
   shell: gh extension upgrade act
   when:
-      - "'nektos/gh-act' in gh_extensions.stdout"
-      - "gh_act_release.json.tag_name not in gh_extensions.stdout"
+    - "'nektos/gh-act' in gh_extensions.stdout"
+    - "gh_act_release.json.tag_name not in gh_extensions.stdout"
   become: false
