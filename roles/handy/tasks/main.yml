@@ -1,0 +1,37 @@
+- name: find current version of handy
+  shell: dpkg -s handy | grep Version | awk '{print $2}'
+  register: current_version
+  failed_when: false
+  changed_when: false
+
+- name: find latest release of handy
+  uri:
+    url: https://api.github.com/repos/cjpais/Handy/releases/latest
+  register: handy_release
+
+- name: install handy
+  when: current_version.stdout != (handy_release.json.tag_name | replace('v', ''))
+  block:
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: set asset
+      set_fact:
+        asset: "{{ handy_release.json.assets | selectattr('name', 'match', '.*amd64.deb') | first }}"
+
+    - name: download handy
+      get_url:
+        url: "{{ asset.browser_download_url }}"
+        dest: "{{ tmp_dir.path }}/{{ asset.name }}"
+
+    - name: install handy
+      apt:
+        deb: "{{ tmp_dir.path }}/{{ asset.name }}"
+      become: true
+
+    - name: remove temp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
