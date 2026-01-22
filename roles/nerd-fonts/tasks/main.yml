@@ -1,17 +1,17 @@
 - name: install required packages
   become: true
   apt:
-      state: present
-      name:
-          - ca-certificates
-          - fontconfig
-          - xz-utils
+    state: present
+    name:
+      - ca-certificates
+      - fontconfig
+      - xz-utils
 
 - name: download and extract fonts to fonts directory.
   include_tasks: "download-font.yml"
   loop: "{{ fonts }}"
   loop_control:
-      loop_var: font
+    loop_var: font
 
 - name: update font cache
   shell: fc-cache -f

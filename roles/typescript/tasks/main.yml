@@ -1,5 +1,5 @@
 - name: install typescript
   npm:
-      name: typescript
-      global: true
-      state: latest
+    name: typescript
+    global: true
+    state: latest

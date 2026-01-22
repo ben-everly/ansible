@@ -1,10 +1,10 @@
 - name: Install snapd
   apt:
-      name: snapd
-      state: latest
-      update_cache: true
+    name: snapd
+    state: latest
+    update_cache: true
 
 - name: install slack
   snap:
-      name:
-          - slack
+    name:
+      - slack

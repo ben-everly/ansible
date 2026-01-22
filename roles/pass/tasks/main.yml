@@ -1,7 +1,7 @@
 - name: Install apt packages
   apt:
-      name:
-          - pass
-          - pass-extension-tomb
-      state: latest
-      update_cache: true
+    name:
+      - pass
+      - pass-extension-tomb
+    state: latest
+    update_cache: true

@@ -1,133 +1,133 @@
 - hosts: all
   vars:
-      docker_compose_version: v2.29.2
-      docker_users:
-          - "{{ ansible_user_id }}"
+    docker_compose_version: v2.29.2
+    docker_users:
+      - "{{ ansible_user_id }}"
   roles:
-      - role: geerlingguy.docker
-        become: true
+    - role: geerlingguy.docker
+      become: true
 
 - hosts: workstation
   environment:
-      PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
+    PATH: "{{ ansible_env.HOME }}/.asdf/bin:{{ ansible_env.HOME }}/.asdf/shims:{{ ansible_env.PATH }}"
   roles:
-      - role: nerd-fonts
-        fonts:
-            - "FiraCode"
-            - "Iosevka"
-            - "IosevkaTerm"
-            - "JetBrainsMono"
-            - "SourceCodePro"
-            - "UbuntuMono"
-      - role: enpass
-        become: true
-      - role: slack
-        become: true
-        when: "'work' in ansible_hostname"
-      - role: zoom
-        become: true
-        when: "'work' in ansible_hostname"
-      - role: cimon-io.asdf
-        asdf_user: "{{ ansible_user_id }}"
-        asdf_group: "{{ ansible_user_id }}"
-        asdf_apt_optional_dependencies:
-            # php 8.4.6
-            - libsqlite3-dev
-            - libgd-dev
-            - libonig-dev
-            - libpq-dev
-            - libzip-dev
-        asdf_plugins:
-            - name: golang
-              repository: https://github.com/kennyp/asdf-golang.git
-              versions: ["1.25.3"]
-              global: "1.25.3"
-            - name: nodejs
-              versions: ["24.10.0"]
-              global: "24.10.0"
-            - name: php
-              versions: ["8.4.15"]
-              global: "8.4.15"
-            - name: java
-              repository: https://github.com/halcyon/asdf-java.git
-              versions: ["openjdk-25"]
-              global: "openjdk-25"
-            - name: ruby
-              versions: ["3.3.4"]
-              global: "3.3.4"
-            - name: python
-              versions: ["2.7.18", "3.14.0"]
-              global: "3.14.0 2.7.18"
-            - name: perl
-              repository: https://github.com/ouest/asdf-perl.git
-              versions: ["5.42.0"]
-              global: "5.42.0"
-            - name: rust
-              repository: https://github.com/asdf-community/asdf-rust.git
-              versions: ["1.90.0"]
-              global: "1.90.0"
-            - name: lua
-              repository: https://github.com/Stratus3D/asdf-lua.git
-              versions: ["5.4.6", "5.1"]
-              global: "5.1"
-            - name: julia
-              repository: https://github.com/rkyleg/asdf-julia.git
-              versions: ["1.12.0"]
-              global: "1.12.0"
-      - role: neovim
-      - role: spotify
-        become: true
-      - role: gh-cli
-        become: true
-      - role: jet
-      - role: typescript
-      - role: pop-shell
-      - role: cli-dev-tools
-      - role: vim-anywhere
-      - role: chrome
-        become: true
-      - role: rcm
-      - role: tomb
-        become: true
-      - role: pass
-        become: true
-      - role: vagrant
-        become: true
-        when: "'work' not in ansible_hostname"
-      - role: aws
-        become: true
-      - role: bottom
-        become: true
-      - role: newsboat
-        become: true
-      - role: calibre
-        become: true
-      - role: zoxide
-        become: true
-      - role: pulumi
-      - role: postman
-        become: true
-      - role: wezterm
-        become: true
-      - role: opencode
+    - role: nerd-fonts
+      fonts:
+        - "FiraCode"
+        - "Iosevka"
+        - "IosevkaTerm"
+        - "JetBrainsMono"
+        - "SourceCodePro"
+        - "UbuntuMono"
+    - role: enpass
+      become: true
+    - role: slack
+      become: true
+      when: "'work' in ansible_hostname"
+    - role: zoom
+      become: true
+      when: "'work' in ansible_hostname"
+    - role: cimon-io.asdf
+      asdf_user: "{{ ansible_user_id }}"
+      asdf_group: "{{ ansible_user_id }}"
+      asdf_apt_optional_dependencies:
+        # php 8.4.6
+        - libsqlite3-dev
+        - libgd-dev
+        - libonig-dev
+        - libpq-dev
+        - libzip-dev
+      asdf_plugins:
+        - name: golang
+          repository: https://github.com/kennyp/asdf-golang.git
+          versions: ["1.25.3"]
+          global: "1.25.3"
+        - name: nodejs
+          versions: ["24.10.0"]
+          global: "24.10.0"
+        - name: php
+          versions: ["8.4.15"]
+          global: "8.4.15"
+        - name: java
+          repository: https://github.com/halcyon/asdf-java.git
+          versions: ["openjdk-25"]
+          global: "openjdk-25"
+        - name: ruby
+          versions: ["3.3.4"]
+          global: "3.3.4"
+        - name: python
+          versions: ["2.7.18", "3.14.0", "3.13.3"]
+          global: "3.14.0 2.7.18"
+        - name: perl
+          repository: https://github.com/ouest/asdf-perl.git
+          versions: ["5.42.0"]
+          global: "5.42.0"
+        - name: rust
+          repository: https://github.com/asdf-community/asdf-rust.git
+          versions: ["1.90.0"]
+          global: "1.90.0"
+        - name: lua
+          repository: https://github.com/Stratus3D/asdf-lua.git
+          versions: ["5.4.6", "5.1"]
+          global: "5.1"
+        - name: julia
+          repository: https://github.com/rkyleg/asdf-julia.git
+          versions: ["1.12.0"]
+          global: "1.12.0"
+    - role: neovim
+    - role: spotify
+      become: true
+    - role: gh-cli
+      become: true
+    - role: jet
+    - role: typescript
+    - role: pop-shell
+    - role: cli-dev-tools
+    - role: vim-anywhere
+    - role: chrome
+      become: true
+    - role: rcm
+    - role: tomb
+      become: true
+    - role: pass
+      become: true
+    - role: vagrant
+      become: true
+      when: "'work' not in ansible_hostname"
+    - role: aws
+      become: true
+    - role: bottom
+      become: true
+    - role: newsboat
+      become: true
+    - role: calibre
+      become: true
+    - role: zoxide
+      become: true
+    - role: pulumi
+    - role: postman
+      become: true
+    - role: wezterm
+      become: true
+    - role: opencode
   tasks:
-      - name: apt update
-        become: true
-        apt:
-            autoclean: true
-            autoremove: true
-            update_cache: true
-            upgrade: "yes"
+    - name: apt update
+      become: true
+      apt:
+        autoclean: true
+        autoremove: true
+        update_cache: true
+        upgrade: "yes"
 
 - hosts: server
   become: true
   tasks:
-      - name: clone docker-compose repo
-        git:
-            repo: https://github.com/ben-everly/server-containers
-            dest: /srv/docker
+    - name: clone docker-compose repo
+      git:
+        repo: https://github.com/ben-everly/server-containers
+        dest: /srv/docker
 
-      - name: start containers
-        shell:
-            cmd: "docker-compose up -d"
-            chdir: /srv/docker
+    - name: start containers
+      shell:
+        cmd: "docker-compose up -d"
+        chdir: /srv/docker

@@ -1,13 +1,13 @@
 - name: install apt dependencies
   become: true
   apt:
-      name:
-          - vim-gtk3
-          - xclip
-      state: latest
-      update_cache: true
+    name:
+      - vim-gtk3
+      - xclip
+    state: latest
+    update_cache: true
 
 - name: install vim-anywhere
   shell: curl -fsSL https://raw.github.com/cknadler/vim-anywhere/master/install | bash
   args:
-      creates: $HOME/.vim-anywhere
+    creates: $HOME/.vim-anywhere

@@ -1,5 +1,5 @@
 roles:
-    - name: geerlingguy.docker
-      version: 6.1.0
-    - name: cimon-io.asdf
-      version: v1.1.0
+  - name: geerlingguy.docker
+    version: 6.1.0
+  - name: cimon-io.asdf
+    version: v1.1.0

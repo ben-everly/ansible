@@ -1,10 +1,10 @@
 - name: Install snapd
   apt:
-      name: snapd
-      state: latest
-      update_cache: true
+    name: snapd
+    state: latest
+    update_cache: true
 
 - name: install spotify
   snap:
-      name:
-          - spotify
+    name:
+      - spotify

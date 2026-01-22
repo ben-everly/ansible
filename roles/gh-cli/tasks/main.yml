@@ -2,7 +2,8 @@
   shell: gh --version | awk '{print $3}'
   register: version
 
-- set_fact:
+- name: set gh-cli version
+  set_fact:
     version: "v{{ version.stdout }}"
 
 - name: find latest release of gh cli
@@ -18,9 +19,11 @@
         state: directory
       register: tmp_dir
 
-    - set_fact:
+    - name: set asset
+      set_fact:
         asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
-    - set_fact:
+    - name: set filename and url
+      set_fact:
         filename: "{{ tmp_dir.path }}/{{ asset.name }}"
         url: "{{ asset.browser_download_url }}"
 

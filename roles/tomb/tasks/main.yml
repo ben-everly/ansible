@@ -1,6 +1,6 @@
 - name: check if tomb is installed
   shell:
-      cmd: which tomb
+    cmd: which tomb
   changed_when: false
   failed_when: result.rc != 0 and result.rc != 1
   register: result
@@ -8,42 +8,42 @@
 - name: install tomb
   when: result.rc == 1
   block:
-      - name: Install apt packages
-        become: true
-        apt:
-            name:
-                - cryptsetup
-                - file
-                - gnupg
-                - make
-                - pinentry-curses
-                - sudo
-                - zsh
-            state: latest
-            update_cache: true
+    - name: Install apt packages
+      become: true
+      apt:
+        name:
+          - cryptsetup
+          - file
+          - gnupg
+          - make
+          - pinentry-curses
+          - sudo
+          - zsh
+        state: latest
+        update_cache: true
 
-      - name: make temp dir
-        tempfile:
-            state: directory
-        register: tmp_dir
+    - name: make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
 
-      - name: download tomb
-        get_url:
-            url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
-            dest: "{{ tmp_dir.path }}/tomb.tar.gz"
-        register: tomb_file
+    - name: download tomb
+      get_url:
+        url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
+        dest: "{{ tmp_dir.path }}/tomb.tar.gz"
+      register: tomb_file
 
-      - name: unzip tomb_file
-        shell: tar xvfz ./tomb.tar.gz
-        args:
-            chdir: "{{ tmp_dir.path }}"
+    - name: unzip tomb_file
+      shell: tar xvfz ./tomb.tar.gz
+      args:
+        chdir: "{{ tmp_dir.path }}"
 
-      - name: run make
-        make:
-            chdir: "{{ tmp_dir.path }}/Tomb-2.9"
-            target: install
+    - name: run make
+      make:
+        chdir: "{{ tmp_dir.path }}/Tomb-2.9"
+        target: install
 
-      - name: remove tmp dir
-        file:
-            path: "{{ tmp_dir.path }}"
-            state: absent
+    - name: remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
