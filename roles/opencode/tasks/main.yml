@@ -1,4 +1,10 @@
 - name: Install OpenCode AI Agent
   ansible.builtin.shell:
-      cmd: "curl -fsSL https://opencode.ai/install | bash"
-      creates: ~/.opencode/bin/opencode
+    cmd: "curl -fsSL https://opencode.ai/install | bash"
+    creates: ~/.opencode/bin/opencode
+
+- name: install pip packages
+  pip:
+    name: uv
+    state: latest
+    executable: $HOME/.asdf/shims/pip
