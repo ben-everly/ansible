@@ -1,0 +1,5 @@
+---
+- name: Install claude-code cli
+  community.general.npm:
+    name: '@anthropic-ai/claude-code'
+    global: yes
