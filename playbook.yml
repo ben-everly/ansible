@@ -74,6 +74,7 @@
           repository: https://github.com/rkyleg/asdf-julia.git
           versions: ["1.12.0"]
           global: "1.12.0"
+    - role: claude-code
     - role: neovim
     - role: spotify
       become: true
