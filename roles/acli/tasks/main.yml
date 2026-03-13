@@ -1,0 +1,22 @@
+- name: download acli GPG key
+  get_url:
+    url: https://acli.atlassian.com/gpg/public-key.asc
+    dest: /etc/apt/keyrings/acli-archive-keyring.asc
+    mode: "0644"
+
+- name: dearmor acli GPG key
+  shell:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/acli-archive-keyring.gpg /etc/apt/keyrings/acli-archive-keyring.asc
+    creates: /etc/apt/keyrings/acli-archive-keyring.gpg
+
+- name: add acli apt repository
+  apt_repository:
+    repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') }} signed-by=/etc/apt/keyrings/acli-archive-keyring.gpg] https://acli.atlassian.com/linux/deb stable main"
+    state: present
+    filename: acli
+
+- name: install acli
+  apt:
+    name: acli
+    state: latest
+    update_cache: true

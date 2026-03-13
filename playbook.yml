@@ -117,6 +117,8 @@
     - role: opencode
     - role: handy
       become: true
+    - role: acli
+      become: true
   tasks:
     - name: apt update
       become: true
