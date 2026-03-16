@@ -1,0 +1,12 @@
+- name: Install flatpak
+  apt:
+    name: flatpak
+    state: latest
+    update_cache: true
+
+- name: Add flathub repository
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    state: present
+  when: ansible_facts["virtualization_type"] != "docker"

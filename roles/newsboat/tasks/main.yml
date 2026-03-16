@@ -1,10 +1,19 @@
-- name: Install snapd
-  apt:
-    name: snapd
-    state: latest
-    update_cache: true
+- name: Install newsboat via pacman
+  pacman:
+    name: newsboat
+    state: present
+  when: ansible_facts["os_family"] == "Archlinux"
 
-- name: Install apt packages
-  snap:
-    name:
-      - newsboat
+- name: Install newsboat via snap (Ubuntu)
+  block:
+    - name: Install snapd
+      apt:
+        name: snapd
+        state: latest
+        update_cache: true
+
+    - name: Install newsboat snap
+      snap:
+        name: newsboat
+      when: ansible_facts["virtualization_type"] != "docker"
+  when: ansible_facts["os_family"] == "Debian"

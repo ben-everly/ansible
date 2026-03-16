@@ -1,10 +1,5 @@
-- name: Install snapd
-  apt:
-    name: snapd
-    state: latest
-    update_cache: true
-
-- name: install zoom
-  snap:
-    name:
-      - zoom-client
+- name: Install zoom
+  community.general.flatpak:
+    name: us.zoom.Zoom
+    state: present
+  when: ansible_facts["virtualization_type"] != "docker"

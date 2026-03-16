@@ -1,3 +1,4 @@
 .vagrant
 .venv/
 __pycache__/
+.claude/

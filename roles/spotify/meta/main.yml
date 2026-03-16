@@ -1,0 +1,6 @@
+---
+galaxy_info:
+  role_name: spotify
+  namespace: local
+dependencies:
+  - role: flatpak-base

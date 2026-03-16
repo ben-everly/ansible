@@ -1,0 +1,6 @@
+---
+platforms:
+  - name: spotify
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    privileged: true
+    pre_build_image: true
