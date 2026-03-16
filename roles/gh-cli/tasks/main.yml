@@ -1,66 +1,51 @@
-- name: find current version of gh cli
-  shell: gh --version | awk '{print $3}'
-  register: version
+- name: download github cli gpg key
+  get_url:
+    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: '0644'
 
-- name: set gh-cli version
-  set_fact:
-    version: "v{{ version.stdout }}"
+- name: add github cli apt repository
+  apt_repository:
+    repo: "deb [arch={{ ansible_dpkg_arch }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    filename: github-cli
 
-- name: find latest release of gh cli
-  uri:
-    url: https://api.github.com/repos/cli/cli/releases/latest
-  register: download
+- name: install gh
+  apt:
+    name: gh
+    state: latest
+    update_cache: true
 
-- name: install gh cli
-  when: version != download.json.tag_name
-  block:
-    - name: make temp dir
-      tempfile:
-        state: directory
-      register: tmp_dir
-
-    - name: set asset
-      set_fact:
-        asset: "{{ download.json.assets | select('match', '.*amd64.deb') | first }}"
-    - name: set filename and url
-      set_fact:
-        filename: "{{ tmp_dir.path }}/{{ asset.name }}"
-        url: "{{ asset.browser_download_url }}"
-
-    - name: download latest version of gh cli
-      get_url:
-        url: "{{ url }}"
-        dest: "{{ filename }}"
-
-    - name: install latest version of gh cli
-      apt: deb="{{ filename }}"
-
-    - name: remove tmp dir
-      file:
-        path: "{{ tmp_dir.path }}"
-        state: absent
-
-- name: check installed gh extensions
-  shell: gh extension list | grep act
-  register: gh_extensions
+- name: check gh auth status
+  command: gh auth status
+  register: gh_auth
   changed_when: false
   failed_when: false
   become: false
 
-- name: get latest gh-act release tag
-  uri:
-    url: https://api.github.com/repos/nektos/gh-act/releases/latest
-  register: gh_act_release
+- name: manage gh extensions
+  when: gh_auth.rc == 0
   become: false
+  block:
+    - name: check installed gh extensions
+      shell: gh extension list | grep act
+      register: gh_extensions
+      changed_when: false
+      failed_when: false
 
-- name: install gh-act extension
-  shell: gh extension install nektos/gh-act
-  when: "'nektos/gh-act' not in gh_extensions.stdout"
-  become: false
+    - name: get latest gh-act release tag
+      uri:
+        url: https://api.github.com/repos/nektos/gh-act/releases/latest
+      register: gh_act_release
 
-- name: update gh-act extension
-  shell: gh extension upgrade act
-  when:
-    - "'nektos/gh-act' in gh_extensions.stdout"
-    - "gh_act_release.json.tag_name not in gh_extensions.stdout"
-  become: false
+    - name: install gh-act extension
+      command: gh extension install nektos/gh-act
+      changed_when: true
+      when: "'nektos/gh-act' not in gh_extensions.stdout"
+
+    - name: update gh-act extension
+      command: gh extension upgrade act
+      register: gh_act_upgrade
+      changed_when: true
+      when:
+        - "'nektos/gh-act' in gh_extensions.stdout"
+        - "gh_act_release.json.tag_name not in gh_extensions.stdout"

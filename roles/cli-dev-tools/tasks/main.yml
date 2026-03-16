@@ -1,7 +1,7 @@
 - name: Install apt packages
   become: true
   apt:
-    name: "{{ cli_apt_packages }}"
+    name: "{{ cli_apt_packages + cli_apt_packages_desktop }}"
     state: latest
     update_cache: true
 
@@ -22,10 +22,13 @@
   register: term
   become: true
   changed_when: false
+  failed_when: false
 
 - name: set alternatives
   become: true
-  when: term.stdout != '/usr/bin/open-wezterm-here'
-  shell:
-    cmd: |
-      update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here
+  when:
+    - term.rc == 0
+    - term.stdout | length > 0
+    - term.stdout != '/usr/bin/open-wezterm-here'
+  command:
+    cmd: update-alternatives --set x-terminal-emulator /usr/bin/open-wezterm-here

@@ -1,0 +1,10 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Install git (required dependency for gh-cli)
+      apt:
+        name: git
+        state: present
+        update_cache: true

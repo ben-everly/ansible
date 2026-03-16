@@ -2,20 +2,22 @@ cli_apt_packages:
   - bash
   - cmake
   - curl
-  - eza
   - fd-find
   - fzf
   - git
   - grep
   - jq
-  - kitty
   - less
-  - mariadb-client
-  - postgresql-client
-  - ranger
   - ripgrep
   - sed
   - sudo
   - unzip
   - vim
   - zsh
+
+cli_apt_packages_desktop:
+  - eza
+  - kitty
+  - mariadb-client
+  - postgresql-client
+  - ranger
