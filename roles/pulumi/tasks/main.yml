@@ -54,6 +54,8 @@
         dest: "{{ pulumi_tmp.path }}/pulumi.tar.gz.sig"
         mode: "0644"
 
+    # pulumi ships a legacy cosign bundle (.sig); if a cosign bump drops
+    # --bundle support for it, this step fails and the molecule test catches it
     - name: verify pulumi tarball signature with cosign
       command:
         argv:
