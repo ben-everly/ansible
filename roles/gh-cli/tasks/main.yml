@@ -1,18 +1,18 @@
-- name: download github cli gpg key
-  get_url:
-    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-    mode: '0644'
-
 - name: get dpkg architecture
   command: dpkg --print-architecture
   register: dpkg_arch
   changed_when: false
 
-- name: add github cli apt repository
-  apt_repository:
-    repo: "deb [arch={{ dpkg_arch.stdout }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-    filename: github-cli
+- name: add github cli repository
+  deb822_repository:
+    name: github-cli
+    types: deb
+    architectures: "{{ dpkg_arch.stdout }}"
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    install_python_debian: true
 
 - name: install gh
   apt:

@@ -1,19 +1,12 @@
-- name: download enpass GPG key
-  get_url:
-    url: https://apt.enpass.io/keys/enpass-linux.key
-    dest: /etc/apt/keyrings/enpass-archive-keyring.asc
-    mode: "0644"
-
-- name: dearmor enpass GPG key
-  shell:
-    cmd: gpg --dearmor -o /etc/apt/keyrings/enpass-archive-keyring.gpg /etc/apt/keyrings/enpass-archive-keyring.asc
-    creates: /etc/apt/keyrings/enpass-archive-keyring.gpg
-
-- name: add enpass apt repository
-  apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/enpass-archive-keyring.gpg] https://apt.enpass.io/ stable main"
-    state: present
-    filename: enpass
+- name: add enpass repository
+  deb822_repository:
+    name: enpass
+    types: deb
+    uris: https://apt.enpass.io/
+    suites: stable
+    components: main
+    signed_by: https://apt.enpass.io/keys/enpass-linux.key
+    install_python_debian: true
 
 - name: Install apt packages
   apt:

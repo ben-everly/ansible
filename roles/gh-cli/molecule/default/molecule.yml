@@ -2,6 +2,8 @@
 platforms:
   - name: gh-cli
     image: geerlingguy/docker-ubuntu2404-ansible:latest
+    # pin: dpkg arch drives the repo, so test on amd64 regardless of host
+    platform: linux/amd64
     privileged: true
     pre_build_image: true
     env:
