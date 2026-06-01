@@ -103,7 +103,7 @@ GH_TOKEN=ghp_xxx molecule test
     ---
     platforms:
         - name: <role-name>
-          image: geerlingguy/docker-ubuntu2204-ansible:latest
+          image: geerlingguy/docker-ubuntu2404-ansible:latest
           privileged: true
           pre_build_image: true
     ```

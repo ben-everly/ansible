@@ -1,0 +1,5 @@
+---
+# renovate bumps the version; update the checksum by hand to match (cosign_checksums.txt)
+# renovate: datasource=github-releases depName=sigstore/cosign
+pulumi_cosign_version: "v3.0.6"
+pulumi_cosign_checksum: "sha256:c956e5dfcac53d52bcf058360d579472f0c1d2d9b69f55209e256fe7783f4c74"

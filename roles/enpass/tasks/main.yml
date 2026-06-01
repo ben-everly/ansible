@@ -1,12 +1,17 @@
-- name: add enpass signing key
+- name: download enpass GPG key
   get_url:
     url: https://apt.enpass.io/keys/enpass-linux.key
-    dest: /etc/apt/trusted.gpg.d/enpass.asc
-    mode: "644"
+    dest: /etc/apt/keyrings/enpass-archive-keyring.asc
+    mode: "0644"
+
+- name: dearmor enpass GPG key
+  shell:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/enpass-archive-keyring.gpg /etc/apt/keyrings/enpass-archive-keyring.asc
+    creates: /etc/apt/keyrings/enpass-archive-keyring.gpg
 
 - name: add enpass apt repository
   apt_repository:
-    repo: deb https://apt.enpass.io/ stable main
+    repo: "deb [signed-by=/etc/apt/keyrings/enpass-archive-keyring.gpg] https://apt.enpass.io/ stable main"
     state: present
     filename: enpass
 

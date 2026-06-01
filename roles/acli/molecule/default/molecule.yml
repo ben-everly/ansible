@@ -1,0 +1,8 @@
+---
+platforms:
+  - name: acli
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    # pin so the test_acli_repo_arch assertion stays valid on non-amd64 hosts
+    platform: linux/amd64
+    privileged: true
+    pre_build_image: true

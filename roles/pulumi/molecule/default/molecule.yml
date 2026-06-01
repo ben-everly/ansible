@@ -1,6 +1,6 @@
 ---
 platforms:
-  - name: slack
+  - name: pulumi
     image: geerlingguy/docker-ubuntu2404-ansible:latest
     privileged: true
     pre_build_image: true

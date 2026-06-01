@@ -1,12 +1,17 @@
-- name: add wezterm signing key
+- name: download wezterm GPG key
   get_url:
     url: https://apt.fury.io/wez/gpg.key
-    dest: /etc/apt/trusted.gpg.d/wezterm.asc
-    mode: "644"
+    dest: /etc/apt/keyrings/wezterm-archive-keyring.asc
+    mode: "0644"
+
+- name: dearmor wezterm GPG key
+  shell:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/wezterm-archive-keyring.gpg /etc/apt/keyrings/wezterm-archive-keyring.asc
+    creates: /etc/apt/keyrings/wezterm-archive-keyring.gpg
 
 - name: add wezterm apt repository
   apt_repository:
-    repo: deb https://apt.fury.io/wez/ * *
+    repo: "deb [signed-by=/etc/apt/keyrings/wezterm-archive-keyring.gpg] https://apt.fury.io/wez/ * *"
     state: present
     filename: wezterm
 

@@ -17,10 +17,62 @@
   failed_when: false
 
 - name: Install Pulumi
-  unarchive:
-    src: "https://get.pulumi.com/releases/sdk/pulumi-v{{ pulumi_version_to_install }}-linux-x64.tar.gz"
-    dest: "$HOME/.local/bin"
-    extra_opts: [--strip-components=1]
-    mode: "0755"
-    remote_src: yes
   when: pulumi_version_to_install not in pulumi_installed_version.stdout | default('')
+  block:
+    # unarchive requires directory to exist
+    - name: ensure install directory exists
+      file:
+        state: directory
+        path: "{{ ansible_env.HOME }}/.local/bin"
+
+    - name: install cosign for signature verification
+      get_url:
+        url: "https://github.com/sigstore/cosign/releases/download/{{ pulumi_cosign_version }}/cosign-linux-amd64"
+        dest: "{{ ansible_env.HOME }}/.local/bin/cosign"
+        mode: "0755"
+        checksum: "{{ pulumi_cosign_checksum }}"
+
+    - name: create temp dir for pulumi download
+      tempfile:
+        state: directory
+      register: pulumi_tmp
+
+    - name: download pulumi tarball
+      get_url:
+        url: "https://github.com/pulumi/pulumi/releases/download/v{{ pulumi_version_to_install }}/pulumi-v{{ pulumi_version_to_install }}-linux-x64.tar.gz"
+        dest: "{{ pulumi_tmp.path }}/pulumi.tar.gz"
+        mode: "0644"
+
+    - name: download pulumi sigstore bundle
+      get_url:
+        url: "https://github.com/pulumi/pulumi/releases/download/v{{ pulumi_version_to_install }}/pulumi-v{{ pulumi_version_to_install }}-linux-x64.tar.gz.sig"
+        dest: "{{ pulumi_tmp.path }}/pulumi.tar.gz.sig"
+        mode: "0644"
+
+    - name: verify pulumi tarball signature with cosign
+      command:
+        argv:
+          - "{{ ansible_env.HOME }}/.local/bin/cosign"
+          - verify-blob
+          - --bundle
+          - "{{ pulumi_tmp.path }}/pulumi.tar.gz.sig"
+          - --certificate-identity-regexp
+          - '^https://github\.com/pulumi/pulumi/\.github/workflows/sign\.yml@.+$'
+          - --certificate-oidc-issuer
+          - https://token.actions.githubusercontent.com
+          - "{{ pulumi_tmp.path }}/pulumi.tar.gz"
+      changed_when: false
+
+    - name: extract pulumi
+      unarchive:
+        src: "{{ pulumi_tmp.path }}/pulumi.tar.gz"
+        dest: "{{ ansible_env.HOME }}/.local/bin"
+        extra_opts: [--strip-components=1]
+        mode: "0755"
+        remote_src: yes
+  always:
+    - name: remove temp dir
+      file:
+        path: "{{ pulumi_tmp.path }}"
+        state: absent
+      when: pulumi_tmp.path is defined
