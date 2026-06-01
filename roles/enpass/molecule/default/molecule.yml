@@ -2,7 +2,7 @@
 platforms:
   - name: enpass
     image: geerlingguy/docker-ubuntu2404-ansible:latest
-    # pin: enpass ships amd64-only packages, so test on amd64 regardless of host
+    # pin: enpass is amd64-only
     platform: linux/amd64
     privileged: true
     pre_build_image: true

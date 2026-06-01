@@ -2,7 +2,5 @@
 platforms:
   - name: wezterm
     image: geerlingguy/docker-ubuntu2404-ansible:latest
-    # pin: the fury repo serves amd64, so test on amd64 regardless of host
-    platform: linux/amd64
     privileged: true
     pre_build_image: true

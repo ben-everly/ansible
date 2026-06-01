@@ -1,13 +1,7 @@
-- name: get dpkg architecture
-  command: dpkg --print-architecture
-  register: dpkg_arch
-  changed_when: false
-
 - name: add acli repository
   deb822_repository:
     name: acli
     types: deb
-    architectures: "{{ dpkg_arch.stdout }}"
     uris: https://acli.atlassian.com/linux/deb
     suites: stable
     components: main

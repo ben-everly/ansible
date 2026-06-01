@@ -2,7 +2,7 @@
 platforms:
   - name: pulumi
     image: geerlingguy/docker-ubuntu2404-ansible:latest
-    # pin: the role installs x86_64 binaries (and asserts x86_64), so test on amd64
+    # pin: role requires x86_64
     platform: linux/amd64
     privileged: true
     pre_build_image: true

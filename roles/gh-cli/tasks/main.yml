@@ -1,13 +1,7 @@
-- name: get dpkg architecture
-  command: dpkg --print-architecture
-  register: dpkg_arch
-  changed_when: false
-
 - name: add github cli repository
   deb822_repository:
     name: github-cli
     types: deb
-    architectures: "{{ dpkg_arch.stdout }}"
     uris: https://cli.github.com/packages
     suites: stable
     components: main

@@ -29,5 +29,5 @@ def test_acli_repo_configured(host):
     assert f.exists
     content = f.content_string
     assert "URIs: https://acli.atlassian.com/linux/deb" in content
-    # guards the ansible_architecture -> amd64 templating
-    assert "Architectures: amd64" in content
+    # repo must be scoped to its own key, not globally-trusted
+    assert "Signed-By: /etc/apt/keyrings/acli.asc" in content
