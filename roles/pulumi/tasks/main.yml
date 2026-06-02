@@ -46,7 +46,7 @@
         url: "https://github.com/sigstore/cosign/releases/download/{{ pulumi_cosign_version }}/cosign-linux-amd64"
         dest: "{{ pulumi_tmp.path }}/cosign"
         mode: "0755"
-        checksum: "{{ pulumi_cosign_checksum }}"
+        checksum: "sha256:https://github.com/sigstore/cosign/releases/download/{{ pulumi_cosign_version }}/cosign_checksums.txt"
 
     - name: download pulumi tarball
       get_url:
