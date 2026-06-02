@@ -26,3 +26,10 @@ def test_enpass_repo_configured(host):
     assert "URIs: https://apt.enpass.io/" in content
     # repo must be scoped to its own key, not globally-trusted
     assert "Signed-By: /etc/apt/keyrings/enpass.asc" in content
+
+
+def test_enpass_no_global_key(host):
+    # the .deb postinst installs a redundant global key; the role strips it,
+    # and the old apt_repository-era .list source must be gone too
+    assert not host.file("/etc/apt/trusted.gpg.d/enpass.asc").exists
+    assert not host.file("/etc/apt/sources.list.d/enpass.list").exists

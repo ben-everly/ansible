@@ -1,3 +1,8 @@
+- name: remove legacy enpass apt source
+  file:
+    path: /etc/apt/sources.list.d/enpass.list
+    state: absent
+
 - name: add enpass repository
   deb822_repository:
     name: enpass
@@ -13,3 +18,11 @@
     name: enpass
     state: latest
     update_cache: true
+
+# the enpass .deb postinst installs a globally-trusted copy of the signing key
+# into trusted.gpg.d; it is redundant with the scoped signed-by key above, so
+# strip it to keep trust scoped to this repo
+- name: remove redundant global enpass key installed by the .deb
+  file:
+    path: /etc/apt/trusted.gpg.d/enpass.asc
+    state: absent

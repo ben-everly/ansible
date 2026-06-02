@@ -1,3 +1,12 @@
+- name: remove legacy acli key and source
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/keyrings/acli-archive-keyring.asc
+    - /etc/apt/keyrings/acli-archive-keyring.gpg
+    - /etc/apt/sources.list.d/acli.list
+
 - name: add acli repository
   deb822_repository:
     name: acli

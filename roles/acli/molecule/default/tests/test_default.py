@@ -31,3 +31,10 @@ def test_acli_repo_configured(host):
     assert "URIs: https://acli.atlassian.com/linux/deb" in content
     # repo must be scoped to its own key, not globally-trusted
     assert "Signed-By: /etc/apt/keyrings/acli.asc" in content
+
+
+def test_acli_no_legacy_artifacts(host):
+    # migration must remove the old keyring and .list source
+    assert not host.file("/etc/apt/keyrings/acli-archive-keyring.gpg").exists
+    assert not host.file("/etc/apt/keyrings/acli-archive-keyring.asc").exists
+    assert not host.file("/etc/apt/sources.list.d/acli.list").exists

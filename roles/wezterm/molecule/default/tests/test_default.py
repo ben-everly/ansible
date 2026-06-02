@@ -29,6 +29,12 @@ def test_wezterm_repo_configured(host):
     assert "Signed-By: /etc/apt/keyrings/wezterm.asc" in content
 
 
+def test_wezterm_no_legacy_artifacts(host):
+    # migration must remove the old globally-trusted key and .list source
+    assert not host.file("/etc/apt/trusted.gpg.d/wezterm.asc").exists
+    assert not host.file("/etc/apt/sources.list.d/wezterm.list").exists
+
+
 def test_wezterm_version(host):
     cmd = host.run("wezterm --version")
     assert cmd.rc == 0, f"wezterm --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
