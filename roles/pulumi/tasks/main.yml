@@ -14,6 +14,12 @@
   set_fact:
     pulumi_version_to_install: "{{ pulumi_latest_version.content }}"
 
+- name: Validate the Pulumi version before using it in URLs
+  assert:
+    that:
+      - pulumi_version_to_install is match('^\d+\.\d+\.\d+$')
+    fail_msg: "unexpected pulumi version '{{ pulumi_version_to_install }}' from latest-version endpoint"
+
 - name: Check if Pulumi is present with the right version
   command: "$HOME/.local/bin/pulumi version"
   register: pulumi_installed_version
@@ -22,7 +28,7 @@
   failed_when: false
 
 - name: Install Pulumi
-  when: pulumi_version_to_install not in pulumi_installed_version.stdout | default('')
+  when: pulumi_version_to_install != (pulumi_installed_version.stdout | default('') | trim | regex_replace('^v', ''))
   block:
     # unarchive requires directory to exist
     - name: ensure install directory exists
