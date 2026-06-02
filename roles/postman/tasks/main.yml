@@ -1,4 +1,5 @@
 - name: Install postman
+  become: true
   community.general.flatpak:
     name: com.getpostman.Postman
     state: present

@@ -20,12 +20,9 @@
         - "SourceCodePro"
         - "UbuntuMono"
     - role: enpass
-      become: true
     - role: slack
-      become: true
       when: "'work' in ansible_hostname"
     - role: zoom
-      become: true
       when: "'work' in ansible_hostname"
     - role: cimon-io.asdf
       asdf_user: "{{ ansible_user_id }}"
@@ -81,44 +78,29 @@
     - role: claude-code
     - role: neovim
     - role: spotify
-      become: true
     - role: gh-cli
-      become: true
     - role: jet
     - role: typescript
     - role: pop-shell
     - role: cli-dev-tools
     - role: vim-anywhere
     - role: chrome
-      become: true
     - role: rcm
     - role: tomb
-      become: true
     - role: pass
-      become: true
     - role: vagrant
-      become: true
       when: "'work' not in ansible_hostname"
     - role: aws
-      become: true
     - role: bottom
-      become: true
     - role: newsboat
-      become: true
     - role: calibre
-      become: true
     - role: zoxide
-      become: true
     - role: pulumi
     - role: postman
-      become: true
     - role: wezterm
-      become: true
     - role: opencode
     - role: handy
-      become: true
     - role: acli
-      become: true
   tasks:
     - name: apt update
       become: true

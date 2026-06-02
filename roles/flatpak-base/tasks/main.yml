@@ -1,10 +1,12 @@
 - name: Install flatpak
+  become: true
   apt:
     name: flatpak
     state: latest
     update_cache: true
 
 - name: Add flathub repository
+  become: true
   community.general.flatpak_remote:
     name: flathub
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo

@@ -1,4 +1,5 @@
 - name: Install zoom
+  become: true
   community.general.flatpak:
     name: us.zoom.Zoom
     state: present

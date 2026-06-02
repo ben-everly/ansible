@@ -1,16 +1,19 @@
 - name: Add vagrant signing key
+  become: true
   get_url:
     url: https://apt.releases.hashicorp.com/gpg
     dest: /etc/apt/trusted.gpg.d/vagrant.asc
     mode: 644
 
 - name: Add vagrant apt repository
+  become: true
   apt_repository:
     repo: deb https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
     state: present
     filename: vagrant
 
 - name: Install apt packages
+  become: true
   apt:
     name:
       - virtualbox

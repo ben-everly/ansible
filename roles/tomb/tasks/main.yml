@@ -39,6 +39,7 @@
         chdir: "{{ tmp_dir.path }}"
 
     - name: Run make
+      become: true
       make:
         chdir: "{{ tmp_dir.path }}/Tomb-2.9"
         target: install

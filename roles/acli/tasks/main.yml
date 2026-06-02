@@ -1,4 +1,5 @@
 - name: Remove legacy acli key and source
+  become: true
   file:
     path: "{{ item }}"
     state: absent
@@ -8,6 +9,7 @@
     - /etc/apt/sources.list.d/acli.list
 
 - name: Add acli repository
+  become: true
   deb822_repository:
     name: acli
     types: deb
@@ -18,6 +20,7 @@
     install_python_debian: true
 
 - name: Install acli
+  become: true
   apt:
     name: acli
     state: latest

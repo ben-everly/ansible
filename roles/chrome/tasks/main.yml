@@ -19,4 +19,5 @@
         dest: "{{ tmp_dir.path }}/chrome.deb"
 
     - name: Install chrome
+      become: true
       apt: 'deb="{{ tmp_dir.path }}/chrome.deb"'

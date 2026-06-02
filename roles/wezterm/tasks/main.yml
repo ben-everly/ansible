@@ -1,4 +1,5 @@
 - name: Remove legacy wezterm key and source
+  become: true
   file:
     path: "{{ item }}"
     state: absent
@@ -7,6 +8,7 @@
     - /etc/apt/sources.list.d/wezterm.list
 
 - name: Add wezterm repository
+  become: true
   deb822_repository:
     name: wezterm
     types: deb
@@ -17,6 +19,7 @@
     install_python_debian: true
 
 - name: Install apt packages
+  become: true
   apt:
     name: wezterm
     state: latest

@@ -1,4 +1,5 @@
 - name: Install newsboat via pacman
+  become: true
   pacman:
     name: newsboat
     state: present
@@ -7,12 +8,14 @@
 - name: Install newsboat via snap (Ubuntu)
   block:
     - name: Install snapd
+      become: true
       apt:
         name: snapd
         state: latest
         update_cache: true
 
     - name: Install newsboat snap
+      become: true
       snap:
         name: newsboat
       when: ansible_facts["virtualization_type"] != "docker"

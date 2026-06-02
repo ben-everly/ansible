@@ -1,9 +1,11 @@
 - name: Remove legacy enpass apt source
+  become: true
   file:
     path: /etc/apt/sources.list.d/enpass.list
     state: absent
 
 - name: Add enpass repository
+  become: true
   deb822_repository:
     name: enpass
     types: deb
@@ -14,6 +16,7 @@
     install_python_debian: true
 
 - name: Install apt packages
+  become: true
   apt:
     name: enpass
     state: latest
@@ -23,6 +26,7 @@
 # into trusted.gpg.d; it is redundant with the scoped signed-by key above, so
 # strip it to keep trust scoped to this repo
 - name: Remove redundant global enpass key installed by the .deb
+  become: true
   file:
     path: /etc/apt/trusted.gpg.d/enpass.asc
     state: absent

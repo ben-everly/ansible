@@ -19,4 +19,5 @@
         dest: "{{ tmp_dir.path }}/bottom.deb"
 
     - name: Install bottom
+      become: true
       apt: 'deb="{{ tmp_dir.path }}/bottom.deb"'

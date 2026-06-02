@@ -1,4 +1,5 @@
 - name: Remove legacy github cli key and source
+  become: true
   file:
     path: "{{ item }}"
     state: absent
@@ -7,6 +8,7 @@
     - /etc/apt/sources.list.d/github-cli.list
 
 - name: Add github cli repository
+  become: true
   deb822_repository:
     name: github-cli
     types: deb
@@ -17,6 +19,7 @@
     install_python_debian: true
 
 - name: Install gh
+  become: true
   apt:
     name: gh
     state: latest
@@ -27,11 +30,9 @@
   register: gh_auth
   changed_when: false
   failed_when: false
-  become: false
 
 - name: Manage gh extensions
   when: gh_auth.rc == 0
-  become: false
   block:
     - name: Check installed gh extensions
       shell: gh extension list | grep act
