@@ -1,10 +1,10 @@
-- name: add vagrant signing key
+- name: Add vagrant signing key
   get_url:
     url: https://apt.releases.hashicorp.com/gpg
     dest: /etc/apt/trusted.gpg.d/vagrant.asc
     mode: 644
 
-- name: add vagrant apt repository
+- name: Add vagrant apt repository
   apt_repository:
     repo: deb https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
     state: present

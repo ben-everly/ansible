@@ -1,4 +1,4 @@
-- name: install required packages
+- name: Install required packages
   become: true
   apt:
     state: present
@@ -7,12 +7,12 @@
       - fontconfig
       - xz-utils
 
-- name: download and extract fonts to fonts directory.
+- name: Download and extract fonts to fonts directory.
   include_tasks: "download-font.yml"
   loop: "{{ fonts }}"
   loop_control:
     loop_var: font
 
-- name: update font cache
+- name: Update font cache
   shell: fc-cache -f
   changed_when: false

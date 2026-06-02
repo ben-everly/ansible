@@ -9,13 +9,13 @@
   set_fact:
     shell: "{{ ansible_env.SHELL }}"
 
-- name: set default shell
+- name: Set default shell
   become: true
   when: shell != '/usr/bin/zsh'
   shell:
     cmd: chsh -s /usr/bin/zsh {{ ansible_user_id }}
 
-- name: query current terminal emulator
+- name: Query current terminal emulator
   shell:
     cmd: |
       update-alternatives --query x-terminal-emulator | grep Value: | awk '{print $2}'
@@ -24,7 +24,7 @@
   changed_when: false
   failed_when: false
 
-- name: set alternatives
+- name: Set alternatives
   become: true
   when:
     - term.rc == 0

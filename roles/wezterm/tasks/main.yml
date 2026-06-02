@@ -1,4 +1,4 @@
-- name: remove legacy wezterm key and source
+- name: Remove legacy wezterm key and source
   file:
     path: "{{ item }}"
     state: absent
@@ -6,7 +6,7 @@
     - /etc/apt/trusted.gpg.d/wezterm.asc
     - /etc/apt/sources.list.d/wezterm.list
 
-- name: add wezterm repository
+- name: Add wezterm repository
   deb822_repository:
     name: wezterm
     types: deb

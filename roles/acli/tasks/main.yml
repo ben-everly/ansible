@@ -1,4 +1,4 @@
-- name: remove legacy acli key and source
+- name: Remove legacy acli key and source
   file:
     path: "{{ item }}"
     state: absent
@@ -7,7 +7,7 @@
     - /etc/apt/keyrings/acli-archive-keyring.gpg
     - /etc/apt/sources.list.d/acli.list
 
-- name: add acli repository
+- name: Add acli repository
   deb822_repository:
     name: acli
     types: deb
@@ -17,7 +17,7 @@
     signed_by: https://acli.atlassian.com/gpg/public-key.asc
     install_python_debian: true
 
-- name: install acli
+- name: Install acli
   apt:
     name: acli
     state: latest

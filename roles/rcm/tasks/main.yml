@@ -10,12 +10,12 @@
     state: latest
     update_cache: true
 
-- name: clone dotfiles repo
+- name: Clone dotfiles repo
   git:
     repo: https://github.com/ben-everly/dotfiles
     dest: $HOME/.dotfiles
   register: dotfiles
 
-- name: update dotfiles
+- name: Update dotfiles
   when: dotfiles.changed
   shell: rcup -f

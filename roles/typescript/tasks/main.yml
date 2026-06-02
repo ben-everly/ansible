@@ -1,4 +1,4 @@
-- name: install typescript
+- name: Install typescript
   npm:
     name: typescript
     global: true

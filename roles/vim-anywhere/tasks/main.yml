@@ -1,4 +1,4 @@
-- name: install apt dependencies
+- name: Install apt dependencies
   become: true
   apt:
     name:
@@ -7,7 +7,7 @@
     state: latest
     update_cache: true
 
-- name: install vim-anywhere
+- name: Install vim-anywhere
   shell: curl -fsSL https://raw.github.com/cknadler/vim-anywhere/master/install | bash
   args:
     creates: $HOME/.vim-anywhere

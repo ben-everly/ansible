@@ -3,7 +3,7 @@
     cmd: "curl -fsSL https://opencode.ai/install | bash"
     creates: ~/.opencode/bin/opencode
 
-- name: install pip packages
+- name: Install pip packages
   pip:
     name: uv
     state: latest

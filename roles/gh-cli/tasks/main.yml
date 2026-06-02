@@ -1,4 +1,4 @@
-- name: remove legacy github cli key and source
+- name: Remove legacy github cli key and source
   file:
     path: "{{ item }}"
     state: absent
@@ -6,7 +6,7 @@
     - /etc/apt/keyrings/githubcli-archive-keyring.gpg
     - /etc/apt/sources.list.d/github-cli.list
 
-- name: add github cli repository
+- name: Add github cli repository
   deb822_repository:
     name: github-cli
     types: deb
@@ -16,40 +16,40 @@
     signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
     install_python_debian: true
 
-- name: install gh
+- name: Install gh
   apt:
     name: gh
     state: latest
     update_cache: true
 
-- name: check gh auth status
+- name: Check gh auth status
   command: gh auth status
   register: gh_auth
   changed_when: false
   failed_when: false
   become: false
 
-- name: manage gh extensions
+- name: Manage gh extensions
   when: gh_auth.rc == 0
   become: false
   block:
-    - name: check installed gh extensions
+    - name: Check installed gh extensions
       shell: gh extension list | grep act
       register: gh_extensions
       changed_when: false
       failed_when: false
 
-    - name: get latest gh-act release tag
+    - name: Get latest gh-act release tag
       uri:
         url: https://api.github.com/repos/nektos/gh-act/releases/latest
       register: gh_act_release
 
-    - name: install gh-act extension
+    - name: Install gh-act extension
       command: gh extension install nektos/gh-act
       changed_when: true
       when: "'nektos/gh-act' not in gh_extensions.stdout"
 
-    - name: update gh-act extension
+    - name: Update gh-act extension
       command: gh extension upgrade act
       register: gh_act_upgrade
       changed_when: true

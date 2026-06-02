@@ -1,4 +1,4 @@
-- name: install apt packages
+- name: Install apt packages
   become: true
   apt:
     name:
@@ -7,36 +7,36 @@
     state: latest
     update_cache: true
 
-- name: register github api for neovim latest release
+- name: Register github api for neovim latest release
   uri:
     url: https://api.github.com/repos/neovim/neovim/releases/latest
   register: neovim
 
-- name: download nvim appimage
+- name: Download nvim appimage
   get_url:
     url: "{{ neovim.json.assets | selectattr('name', 'equalto', 'nvim-linux-x86_64.appimage') | map(attribute='browser_download_url') | first }}"
     dest: $HOME/.local/bin/nvim
     mode: "755"
 
-- name: install pip packages
+- name: Install pip packages
   pip:
     name: pynvim
     state: latest
     executable: $HOME/.asdf/shims/pip
 
-- name: install pip2 packages
+- name: Install pip2 packages
   pip:
     name: pynvim
     state: latest
     executable: $HOME/.asdf/shims/pip2
 
-- name: install ruby packages
+- name: Install ruby packages
   gem:
     name: neovim
     state: latest
     executable: $HOME/.asdf/shims/gem
 
-- name: install node neovim package
+- name: Install node neovim package
   npm:
     name: "{{ item }}"
     global: true
@@ -47,7 +47,7 @@
     - yarn
     - tree-sitter-cli
 
-- name: install cpan packages
+- name: Install cpan packages
   cpanm:
     name: "{{ item }}"
     notest: true
