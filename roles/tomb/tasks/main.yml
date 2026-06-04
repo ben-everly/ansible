@@ -31,12 +31,13 @@
       get_url:
         url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
         dest: "{{ tmp_dir.path }}/tomb.tar.gz"
-      register: tomb_file
+        checksum: "sha256:b3a23c6680815f7557a3c4bd73d2b2dbde870a62357fcbf9b33089afae75d68c"
 
-    - name: Unzip tomb_file
-      shell: tar xvfz ./tomb.tar.gz
-      args:
-        chdir: "{{ tmp_dir.path }}"
+    - name: Extract tomb
+      unarchive:
+        src: "{{ tmp_dir.path }}/tomb.tar.gz"
+        dest: "{{ tmp_dir.path }}"
+        remote_src: true
 
     - name: Run make
       become: true
