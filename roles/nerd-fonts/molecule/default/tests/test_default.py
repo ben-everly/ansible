@@ -2,6 +2,7 @@ import pytest
 
 
 @pytest.mark.parametrize("pkg", [
+    "ca-certificates",
     "fontconfig",
     "xz-utils",
 ])
