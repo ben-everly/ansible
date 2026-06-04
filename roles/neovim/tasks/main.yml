@@ -18,40 +18,75 @@
     dest: $HOME/.local/bin/nvim
     mode: "755"
 
+- name: Check for pip
+  shell: command -v pip
+  register: pip_check
+  changed_when: false
+  failed_when: false
+
 - name: Install pip packages
+  when: pip_check.rc == 0
   pip:
     name: pynvim
     state: latest
-    executable: $HOME/.asdf/shims/pip
+    executable: pip
+
+- name: Check for pip2
+  shell: command -v pip2
+  register: pip2_check
+  changed_when: false
+  failed_when: false
 
 - name: Install pip2 packages
+  when: pip2_check.rc == 0
   pip:
     name: pynvim
     state: latest
-    executable: $HOME/.asdf/shims/pip2
+    executable: pip2
+
+- name: Check for gem
+  shell: command -v gem
+  register: gem_check
+  changed_when: false
+  failed_when: false
 
 - name: Install ruby packages
+  when: gem_check.rc == 0
   gem:
     name: neovim
     state: latest
-    executable: $HOME/.asdf/shims/gem
+    executable: gem
 
-- name: Install node neovim package
+- name: Check for npm
+  shell: command -v npm
+  register: npm_check
+  changed_when: false
+  failed_when: false
+
+- name: Install node neovim packages
+  when: npm_check.rc == 0
   npm:
     name: "{{ item }}"
     global: true
     state: latest
-    executable: $HOME/.asdf/shims/npm
+    executable: npm
   with_items:
     - neovim
     - yarn
     - tree-sitter-cli
 
+- name: Check for cpanm
+  shell: command -v cpanm
+  register: cpanm_check
+  changed_when: false
+  failed_when: false
+
 - name: Install cpan packages
+  when: cpanm_check.rc == 0
   cpanm:
     name: "{{ item }}"
     notest: true
-    executable: $HOME/.asdf/shims/cpanm
+    executable: cpanm
   with_items:
     - Neovim::Ext
     - App::cpanminus
