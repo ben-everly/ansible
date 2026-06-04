@@ -1,5 +1,5 @@
 - name: Find current version of handy
-  shell: dpkg -s handy | grep Version | awk '{print $2}'
+  command: dpkg-query -W -f='${Version}' handy
   register: current_version
   failed_when: false
   changed_when: false
