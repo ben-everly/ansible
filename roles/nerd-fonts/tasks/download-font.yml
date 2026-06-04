@@ -14,16 +14,21 @@
   set_fact:
     current_version: "0.0.0"
 
+- name: Stat current version file for {{ font }}
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
+  register: current_version_file
+
 - name: Read current version file for {{ font }}
   slurp:
     src: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
   register: current_version_file_content
-  ignore_errors: true
+  when: current_version_file.stat.exists
 
 - name: Set current version for {{ font }}
   set_fact:
     current_version: "{{ current_version_file_content.content | b64decode | trim }}"
-  when: current_version_file_content is defined and current_version_file_content.content is defined
+  when: current_version_file.stat.exists
 
 - name: Debug current version for {{ font }}
   debug:
