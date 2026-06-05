@@ -90,3 +90,16 @@
   with_items:
     - Neovim::Ext
     - App::cpanminus
+
+- name: Warn about provider runtimes missing from PATH
+  vars:
+    provider_checks:
+      pip: "{{ pip_check }}"
+      pip2: "{{ pip2_check }}"
+      gem: "{{ gem_check }}"
+      npm: "{{ npm_check }}"
+      cpanm: "{{ cpanm_check }}"
+    missing_providers: "{{ provider_checks | dict2items | rejectattr('value.rc', 'eq', 0) | map(attribute='key') | list }}"
+  debug:
+    msg: "WARNING: provider runtimes not on PATH, installs skipped: {{ missing_providers | join(', ') }}"
+  when: missing_providers | length > 0
