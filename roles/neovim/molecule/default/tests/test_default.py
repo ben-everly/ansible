@@ -19,9 +19,9 @@ def test_nvim_runs(host):
 
 
 def test_python_provider_installed(host):
-    # pynvim must land in the venv that bare 'pip' resolves to
-    cmd = host.run("/opt/nvenv/bin/python -c 'import pynvim'")
-    assert cmd.rc == 0, f"pynvim not importable: {cmd.stderr!r}"
+    # resolve pip from PATH, same as the role does (see prepare.yml)
+    cmd = host.run("pip show pynvim")
+    assert cmd.rc == 0, f"pynvim not installed for `pip`: {cmd.stderr!r}"
 
 
 def test_node_provider_installed(host):

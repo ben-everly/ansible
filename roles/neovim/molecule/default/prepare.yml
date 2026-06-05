@@ -1,4 +1,7 @@
 ---
+# Production resolves pip/npm/gem/cpanm via asdf shims on the play-level PATH
+# (see playbook.yml). Installing asdf here is slow and brittle, so a venv pip
+# on PATH stands in — this covers the role's PATH-based installs, not asdf.
 - name: Prepare
   hosts: all
   become: true
