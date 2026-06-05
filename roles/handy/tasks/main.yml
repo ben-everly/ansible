@@ -29,6 +29,7 @@
     - name: Install handy
       apt:
         deb: "{{ tmp_dir.path }}/{{ asset.name }}"
+        update_cache: true
       become: true
 
     - name: Remove temp dir
