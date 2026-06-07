@@ -12,6 +12,8 @@
     url: https://api.github.com/repos/neovim/neovim/releases/latest
   register: neovim
 
+# upstream publishes no checksums or signatures for release assets
+# (checked v0.12.x), so HTTPS is the only integrity guarantee available
 - name: Download nvim appimage
   get_url:
     url: "{{ neovim.json.assets | selectattr('name', 'equalto', 'nvim-linux-x86_64.appimage') | map(attribute='browser_download_url') | first }}"

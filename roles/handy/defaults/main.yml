@@ -1,0 +1,5 @@
+---
+# Tauri updater minisign public key for cjpais/Handy, pinned as the trust
+# anchor: artifacts from any future release verify against this same key.
+# Source: src-tauri/tauri.conf.json in the upstream repo.
+handy_minisign_pubkey: "RWT5AWYglSC3utQf/3c8jWaZ5ECl7vFNU3R/Yj0UwfDSJCPk1qyDQl//"
