@@ -4,6 +4,13 @@
     path: /etc/apt/sources.list.d/enpass.list
     state: absent
 
+- name: Install enpass signing key
+  become: true
+  copy:
+    src: enpass.asc
+    dest: /etc/apt/keyrings/enpass.asc
+    mode: "0644"
+
 - name: Add enpass repository
   become: true
   deb822_repository:
@@ -12,7 +19,7 @@
     uris: https://apt.enpass.io/
     suites: stable
     components: main
-    signed_by: https://apt.enpass.io/keys/enpass-linux.key
+    signed_by: /etc/apt/keyrings/enpass.asc
     install_python_debian: true
 
 - name: Install apt packages

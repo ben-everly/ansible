@@ -1,3 +1,7 @@
+# verify at https://www.hashicorp.com/security (Linux Package Verification)
+VAGRANT_KEY_FPR = "798AEC654E5C15428C8E42EEAA16FCBCA621E701"
+
+
 def test_vagrant_package_installed(host):
     assert host.package("vagrant").is_installed
 
@@ -7,8 +11,9 @@ def test_vagrant_keyring_present(host):
     f = host.file(keyring)
     assert f.exists
     assert f.size > 0
-    cmd = host.run(f"gpg --show-keys {keyring}")
+    cmd = host.run(f"gpg --show-keys --with-colons {keyring}")
     assert cmd.rc == 0, f"gpg --show-keys failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
+    assert VAGRANT_KEY_FPR in cmd.stdout, f"unexpected key fingerprint: {cmd.stdout!r}"
 
 
 def test_vagrant_version(host):

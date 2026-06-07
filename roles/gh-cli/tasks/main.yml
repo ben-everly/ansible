@@ -5,7 +5,16 @@
     state: absent
   loop:
     - /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    # binary key the module fetched while signed_by was a URL
+    - /etc/apt/keyrings/github-cli.gpg
     - /etc/apt/sources.list.d/github-cli.list
+
+- name: Install github cli signing key
+  become: true
+  copy:
+    src: gh-cli.asc
+    dest: /etc/apt/keyrings/github-cli.asc
+    mode: "0644"
 
 - name: Add github cli repository
   become: true
@@ -15,7 +24,7 @@
     uris: https://cli.github.com/packages
     suites: stable
     components: main
-    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    signed_by: /etc/apt/keyrings/github-cli.asc
     install_python_debian: true
 
 - name: Install gh
