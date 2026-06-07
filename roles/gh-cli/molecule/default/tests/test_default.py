@@ -33,8 +33,7 @@ def test_gh_version(host):
 
 
 def test_gh_act_extension(host):
-    token_check = host.run('test -n "$GH_TOKEN"')
-    if token_check.rc != 0:
-        pytest.skip("GH_TOKEN not set, skipping extension test")
+    if host.run("gh auth status").rc != 0:
+        pytest.skip("gh not authenticated, extensions not managed")
     cmd = host.run("gh extension list")
     assert "nektos/gh-act" in cmd.stdout
