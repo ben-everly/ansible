@@ -1,9 +1,3 @@
-- name: Create directory for {{ font }}
-  file:
-    path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
-    mode: 0775
-    state: directory
-
 - name: Github api version check for {{ font }}
   uri:
     url: "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
@@ -34,36 +28,47 @@
   debug:
     msg: "Current version of {{ font }} is {{ current_version }}"
 
-- name: Make temp dir for {{ font }}
-  tempfile:
-    state: directory
-  register: font_tmp
+- name: Install {{ font }} {{ latest_version.json.tag_name }}
   when: latest_version.json.tag_name != current_version
+  block:
+    - name: Make temp dir for {{ font }}
+      tempfile:
+        state: directory
+      register: font_tmp
 
-# use the tag the version check saw; /latest/ can move between check and download
-- name: Download {{ font }}
-  get_url:
-    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/{{ font }}.tar.xz"
-    dest: "{{ font_tmp.path }}/{{ font }}.tar.xz"
-    checksum: "sha256:https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/SHA-256.txt"
-  when: latest_version.json.tag_name != current_version
+    # use the tag the version check saw; /latest/ can move between check and download
+    - name: Download {{ font }}
+      get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/{{ font }}.tar.xz"
+        dest: "{{ font_tmp.path }}/{{ font }}.tar.xz"
+        checksum: "sha256:https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/SHA-256.txt"
 
-- name: Extract {{ font }}
-  ansible.builtin.unarchive:
-    src: "{{ font_tmp.path }}/{{ font }}.tar.xz"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
-    remote_src: true
-  when: latest_version.json.tag_name != current_version
+    # reset the dir so files renamed or removed upstream don't linger across releases
+    - name: Reset font directory for {{ font }}
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        state: absent
 
-- name: Remove temp dir for {{ font }}
-  file:
-    path: "{{ font_tmp.path }}"
-    state: absent
-  when: latest_version.json.tag_name != current_version
+    - name: Create directory for {{ font }}
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        mode: "0775"
+        state: directory
 
-- name: Write latest version to file for {{ font }}
-  copy:
-    content: "{{ latest_version.json.tag_name }}"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
-    mode: "0644"
-  when: latest_version.json.tag_name != current_version
+    - name: Extract {{ font }}
+      ansible.builtin.unarchive:
+        src: "{{ font_tmp.path }}/{{ font }}.tar.xz"
+        dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        remote_src: true
+
+    - name: Write latest version to file for {{ font }}
+      copy:
+        content: "{{ latest_version.json.tag_name }}"
+        dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
+        mode: "0644"
+  always:
+    - name: Remove temp dir for {{ font }}
+      file:
+        path: "{{ font_tmp.path }}"
+        state: absent
+      when: font_tmp.path is defined
