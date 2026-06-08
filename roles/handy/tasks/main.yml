@@ -12,6 +12,16 @@
 - name: Install handy
   when: current_version.stdout != (handy_release.json.tag_name | replace('v', ''))
   block:
+    - name: Assert release publishes the expected amd64 deb and signature
+      assert:
+        that:
+          - handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb$') | list | length == 1
+          - handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb[.]sig$') | list | length == 1
+        fail_msg: >-
+          Release {{ handy_release.json.tag_name }} is missing the expected
+          amd64 .deb and/or .deb.sig asset; refusing to install unverified.
+          Assets found: {{ handy_release.json.assets | map(attribute='name') | list }}
+
     - name: Make temp dir
       tempfile:
         state: directory
