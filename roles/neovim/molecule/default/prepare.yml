@@ -1,7 +1,8 @@
 ---
 # Production resolves pip/npm/gem/cpanm via asdf shims on the play-level PATH
-# (see playbook.yml). Installing asdf here is slow and brittle, so a venv pip
-# on PATH stands in — this covers the role's PATH-based installs, not asdf.
+# (see playbook.yml). Installing asdf here is slow and brittle, so system
+# runtimes on PATH stand in — this exercises the role's PATH-based installs
+# for every provider, just not the asdf shim resolution itself.
 - name: Prepare
   hosts: all
   become: true
@@ -11,6 +12,11 @@
         name:
           - python3-venv
           - npm
+          - ruby
+          - ruby-dev # build the neovim gem's native msgpack extension
+          - cpanminus # provides cpanm; pulls in perl
+          - libperl-dev # build the Neovim::Ext perl module's XS deps
+          - build-essential # compiler/make for the native gem and cpan builds
         state: present
         update_cache: true
 

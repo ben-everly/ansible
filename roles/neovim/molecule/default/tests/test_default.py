@@ -27,3 +27,13 @@ def test_python_provider_installed(host):
 def test_node_provider_installed(host):
     cmd = host.run("npm ls -g neovim")
     assert cmd.rc == 0, f"global npm neovim package missing: {cmd.stdout!r}"
+
+
+def test_ruby_provider_installed(host):
+    cmd = host.run("gem list -i neovim")
+    assert cmd.rc == 0, f"neovim ruby gem missing: {cmd.stdout!r}"
+
+
+def test_perl_provider_installed(host):
+    cmd = host.run("perl -MNeovim::Ext -e 1")
+    assert cmd.rc == 0, f"Neovim::Ext perl module missing: {cmd.stderr!r}"
