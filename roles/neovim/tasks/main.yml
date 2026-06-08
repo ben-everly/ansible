@@ -33,19 +33,6 @@
     state: latest
     executable: pip
 
-- name: Check for pip2
-  shell: command -v pip2
-  register: pip2_check
-  changed_when: false
-  failed_when: false
-
-- name: Install pip2 packages
-  when: pip2_check.rc == 0
-  pip:
-    name: pynvim
-    state: latest
-    executable: pip2
-
 - name: Check for gem
   shell: command -v gem
   register: gem_check
@@ -93,15 +80,18 @@
     - Neovim::Ext
     - App::cpanminus
 
-- name: Warn about provider runtimes missing from PATH
+- name: Surface provider runtimes missing from PATH
   vars:
     provider_checks:
       pip: "{{ pip_check }}"
-      pip2: "{{ pip2_check }}"
       gem: "{{ gem_check }}"
       npm: "{{ npm_check }}"
       cpanm: "{{ cpanm_check }}"
     missing_providers: "{{ provider_checks | dict2items | rejectattr('value.rc', 'eq', 0) | map(attribute='key') | list }}"
-  debug:
-    msg: "WARNING: provider runtimes not on PATH, installs skipped: {{ missing_providers | join(', ') }}"
+    missing_required: "{{ missing_providers | intersect(neovim_required_providers) }}"
+  fail:
+    msg: >-
+      provider runtimes not on PATH, installs skipped: {{ missing_providers | join(', ') }}.
+      {% if missing_required %}Required providers missing — failing: {{ missing_required | join(', ') }}.{% endif %}
   when: missing_providers | length > 0
+  ignore_errors: "{{ missing_required | length == 0 }}"
