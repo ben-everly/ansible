@@ -65,7 +65,6 @@
     executable: cpanm
   with_items:
     - Neovim::Ext
-    - App::cpanminus
 
 - name: Verify provider packages installed
   shell: "{{ neovim_provider_verify[item] }}"
