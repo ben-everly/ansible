@@ -50,7 +50,7 @@
         dest: "{{ tmp_dir.path }}/{{ sig_asset.name }}"
 
     - name: Decode tauri signature to minisign format
-      shell: base64 -d "{{ tmp_dir.path }}/{{ sig_asset.name }}" > "{{ tmp_dir.path }}/handy.minisig"
+      shell: base64 -d {{ (tmp_dir.path ~ '/' ~ sig_asset.name) | quote }} > {{ tmp_dir.path }}/handy.minisig
       changed_when: false
 
     - name: Stat the decoded signature
