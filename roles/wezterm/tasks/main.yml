@@ -20,6 +20,7 @@
     name: wezterm
     types: deb
     uris: https://apt.fury.io/wez/
+    # flat Gemfury repo; wezterm documents the "* *" wildcards
     suites: "*"
     components: "*"
     signed_by: /etc/apt/keyrings/wezterm.asc
