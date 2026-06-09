@@ -1,2 +1,7 @@
 ---
+neovim_provider_runtimes:
+  - pip
+  - gem
+  - npm
+  - cpanm
 neovim_required_providers: []

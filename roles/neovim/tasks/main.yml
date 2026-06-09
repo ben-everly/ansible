@@ -20,40 +20,33 @@
     dest: $HOME/.local/bin/nvim
     mode: "755"
 
-- name: Check for pip
-  shell: command -v pip
-  register: pip_check
+- name: Check which provider runtimes are on PATH
+  shell: "command -v {{ item }}"
+  loop: "{{ neovim_provider_runtimes }}"
+  register: provider_checks
   changed_when: false
   failed_when: false
 
+- name: Resolve which provider runtimes are available
+  set_fact:
+    providers_present: "{{ provider_checks.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
+
 - name: Install pip packages
-  when: pip_check.rc == 0
+  when: "'pip' in providers_present"
   pip:
     name: pynvim
     state: latest
     executable: pip
 
-- name: Check for gem
-  shell: command -v gem
-  register: gem_check
-  changed_when: false
-  failed_when: false
-
 - name: Install ruby packages
-  when: gem_check.rc == 0
+  when: "'gem' in providers_present"
   gem:
     name: neovim
     state: latest
     executable: gem
 
-- name: Check for npm
-  shell: command -v npm
-  register: npm_check
-  changed_when: false
-  failed_when: false
-
 - name: Install node neovim packages
-  when: npm_check.rc == 0
+  when: "'npm' in providers_present"
   npm:
     name: "{{ item }}"
     global: true
@@ -64,14 +57,8 @@
     - yarn
     - tree-sitter-cli
 
-- name: Check for cpanm
-  shell: command -v cpanm
-  register: cpanm_check
-  changed_when: false
-  failed_when: false
-
 - name: Install cpan packages
-  when: cpanm_check.rc == 0
+  when: "'cpanm' in providers_present"
   cpanm:
     name: "{{ item }}"
     notest: true
@@ -80,18 +67,31 @@
     - Neovim::Ext
     - App::cpanminus
 
-- name: Surface provider runtimes missing from PATH
+- name: Verify provider packages installed
+  shell: "{{ neovim_provider_verify[item] }}"
   vars:
-    provider_checks:
-      pip: "{{ pip_check }}"
-      gem: "{{ gem_check }}"
-      npm: "{{ npm_check }}"
-      cpanm: "{{ cpanm_check }}"
-    missing_providers: "{{ provider_checks | dict2items | rejectattr('value.rc', 'eq', 0) | map(attribute='key') | list }}"
-    missing_required: "{{ missing_providers | intersect(neovim_required_providers) }}"
-  fail:
-    msg: >-
-      provider runtimes not on PATH, installs skipped: {{ missing_providers | join(', ') }}.
-      {% if missing_required %}Required providers missing — failing: {{ missing_required | join(', ') }}.{% endif %}
-  when: missing_providers | length > 0
-  ignore_errors: "{{ missing_required | length == 0 }}"
+    neovim_provider_verify:
+      pip: pip show pynvim
+      gem: gem list -i neovim
+      npm: npm ls -g neovim
+      cpanm: perl -MNeovim::Ext -e 1
+  loop: "{{ providers_present }}"
+  register: provider_verifications
+  changed_when: false
+  failed_when: false
+
+- name: Surface provider runtimes that did not install
+  vars:
+    verified_providers: "{{ provider_verifications.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
+    failed_providers: "{{ neovim_provider_runtimes | difference(verified_providers) }}"
+    failed_required: "{{ failed_providers | intersect(neovim_required_providers) }}"
+  block:
+    - name: Warn about provider runtimes that did not install
+      debug:
+        msg: "neovim provider runtimes unavailable or failed to install: {{ failed_providers | join(', ') }}"
+      when: failed_providers | length > 0
+
+    - name: Fail when a required provider did not install
+      fail:
+        msg: "required neovim providers missing or failed to install: {{ failed_required | join(', ') }}"
+      when: failed_required | length > 0
