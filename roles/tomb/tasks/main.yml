@@ -44,8 +44,9 @@
       make:
         chdir: "{{ tmp_dir.path }}/Tomb-{{ tomb_version }}"
         target: install
-
+  always:
     - name: Remove tmp dir
       file:
         path: "{{ tmp_dir.path }}"
         state: absent
+      when: tmp_dir.path is defined
