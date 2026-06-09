@@ -53,6 +53,19 @@
       shell: base64 -d "{{ tmp_dir.path }}/{{ sig_asset.name }}" > "{{ tmp_dir.path }}/handy.minisig"
       changed_when: false
 
+    - name: Stat the decoded signature
+      stat:
+        path: "{{ tmp_dir.path }}/handy.minisig"
+      register: handy_minisig
+
+    - name: Assert the decoded signature is non-empty
+      assert:
+        that:
+          - handy_minisig.stat.size > 0
+        fail_msg: >-
+          Decoded signature is empty; the {{ sig_asset.name }} download is
+          corrupt or unexpected. Refusing to install unverified.
+
     - name: Verify handy signature against pinned key
       command:
         argv:
@@ -64,7 +77,20 @@
           - "{{ tmp_dir.path }}/{{ asset.name }}"
           - -x
           - "{{ tmp_dir.path }}/handy.minisig"
+      register: handy_verify
       changed_when: false
+      failed_when: false
+
+    - name: Assert the signature verified against the pinned key
+      assert:
+        that:
+          - handy_verify.rc == 0
+        fail_msg: >-
+          minisign could not verify {{ asset.name }} against the pinned key.
+          If cjpais/Handy rotated its Tauri updater key, re-pin
+          handy_minisign_pubkey (roles/handy/defaults/main.yml) from
+          src-tauri/tauri.conf.json after re-establishing trust.
+          minisign: {{ handy_verify.stderr }}
 
     - name: Install handy
       apt:
