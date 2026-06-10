@@ -1,8 +1,11 @@
-- name: Github api version check for {{ font }}
-  uri:
-    url: "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
-    return_content: true
-  register: latest_version
+- name: Assert a pinned checksum exists for {{ font }}
+  assert:
+    that:
+      - font in nerd_fonts_sha256
+    fail_msg: >-
+      No pinned sha256 for {{ font }} in nerd_fonts_sha256
+      (roles/nerd-fonts/defaults/main.yml). Add the {{ font }}.tar.xz checksum
+      from the {{ nerd_fonts_version }} SHA-256.txt before installing.
 
 - name: Reset current version to '0.0.0'
   set_fact:
@@ -28,20 +31,19 @@
   debug:
     msg: "Current version of {{ font }} is {{ current_version }}"
 
-- name: Install {{ font }} {{ latest_version.json.tag_name }}
-  when: latest_version.json.tag_name != current_version
+- name: Install {{ font }} {{ nerd_fonts_version }}
+  when: nerd_fonts_version != current_version
   block:
     - name: Make temp dir for {{ font }}
       tempfile:
         state: directory
       register: font_tmp
 
-    # use the tag the version check saw; /latest/ can move between check and download
     - name: Download {{ font }}
       get_url:
-        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/{{ font }}.tar.xz"
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ font }}.tar.xz"
         dest: "{{ font_tmp.path }}/{{ font }}.tar.xz"
-        checksum: "sha256:https://github.com/ryanoasis/nerd-fonts/releases/download/{{ latest_version.json.tag_name }}/SHA-256.txt"
+        checksum: "sha256:{{ nerd_fonts_sha256[font] }}"
 
     # reset the dir so files renamed or removed upstream don't linger across releases
     - name: Reset font directory for {{ font }}
@@ -63,7 +65,7 @@
 
     - name: Write latest version to file for {{ font }}
       copy:
-        content: "{{ latest_version.json.tag_name }}"
+        content: "{{ nerd_fonts_version }}"
         dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
         mode: "0644"
   always:
