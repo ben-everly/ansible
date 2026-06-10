@@ -12,7 +12,7 @@
 - name: Install github cli signing key
   become: true
   copy:
-    src: gh-cli.asc
+    src: github-cli.asc
     dest: /etc/apt/keyrings/github-cli.asc
     mode: "0644"
 

@@ -48,7 +48,7 @@ make test
 Run tests for a specific role:
 
 ```sh
-make test ROLE=gh-cli
+make test ROLE=github-cli
 ```
 
 Run individual stages (useful during development):
@@ -81,9 +81,9 @@ Some roles adapt their behavior based on environment variables:
 
 | Variable   | Role     | Effect                                                                                                          |
 | ---------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `GH_TOKEN` | `gh-cli` | When set, gh extensions are installed and tested. When unset, extension tasks and tests are skipped gracefully. |
+| `GH_TOKEN` | `github-cli` | When set, gh extensions are installed and tested. When unset, extension tasks and tests are skipped gracefully. |
 
-To run gh-cli tests with extension coverage:
+To run github-cli tests with extension coverage:
 
 ```sh
 GH_TOKEN=ghp_xxx molecule test

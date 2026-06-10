@@ -83,7 +83,7 @@
         - npm
         - cpanm
     - role: spotify
-    - role: gh-cli
+    - role: github-cli
     - role: typescript
     - role: pop-shell
     - role: cli-dev-tools
