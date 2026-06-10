@@ -96,8 +96,9 @@
       apt:
         deb: "{{ tmp_dir.path }}/{{ asset.name }}"
       become: true
-
+  always:
     - name: Remove temp dir
       file:
         path: "{{ tmp_dir.path }}"
         state: absent
+      when: tmp_dir.path is defined
