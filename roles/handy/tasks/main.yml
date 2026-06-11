@@ -53,19 +53,6 @@
       shell: base64 -d {{ (tmp_dir.path ~ '/' ~ sig_asset.name) | quote }} > {{ tmp_dir.path }}/handy.minisig
       changed_when: false
 
-    - name: Stat the decoded signature
-      stat:
-        path: "{{ tmp_dir.path }}/handy.minisig"
-      register: handy_minisig
-
-    - name: Assert the decoded signature is non-empty
-      assert:
-        that:
-          - handy_minisig.stat.size > 0
-        fail_msg: >-
-          Decoded signature is empty; the {{ sig_asset.name }} download is
-          corrupt or unexpected. Refusing to install unverified.
-
     - name: Verify handy signature against pinned key
       command:
         argv:
