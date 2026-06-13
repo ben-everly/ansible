@@ -68,12 +68,6 @@
 
 - name: Verify provider packages installed
   shell: "{{ neovim_provider_verify[item] }}"
-  vars:
-    neovim_provider_verify:
-      pip: pip show pynvim
-      gem: gem list -i neovim
-      npm: npm ls -g neovim
-      cpanm: perl -MNeovim::Ext -e 1
   loop: "{{ providers_present }}"
   register: provider_verifications
   changed_when: false

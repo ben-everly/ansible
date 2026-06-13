@@ -1,7 +1,10 @@
 ---
+# provider runtimes to set up, from the supported set in vars/main.yml;
+# drop one to skip its neovim package entirely
 neovim_provider_runtimes:
   - pip
   - gem
   - npm
   - cpanm
+
 neovim_required_providers: []
