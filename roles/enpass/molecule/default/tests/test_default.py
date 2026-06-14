@@ -10,13 +10,19 @@ def test_enpass_binary(host):
     assert f.mode & 0o111
 
 
+# key from https://apt.enpass.io/keys/enpass-linux.key, captured 2026-06-07
+# no independent fingerprint published upstream (trust-on-first-use)
+ENPASS_KEY_FPR = "F433834B65BE665BCE974660877653760D0214BC"
+
+
 def test_enpass_keyring_present(host):
     keyring = "/etc/apt/keyrings/enpass.asc"
     f = host.file(keyring)
     assert f.exists
     assert f.size > 0
-    cmd = host.run(f"gpg --show-keys {keyring}")
+    cmd = host.run(f"gpg --show-keys --with-colons {keyring}")
     assert cmd.rc == 0, f"gpg --show-keys failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
+    assert ENPASS_KEY_FPR in cmd.stdout, f"unexpected key fingerprint: {cmd.stdout!r}"
 
 
 def test_enpass_repo_configured(host):

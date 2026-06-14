@@ -1,0 +1,38 @@
+---
+# Production resolves pip/npm/gem/cpanm via asdf shims on the play-level PATH
+# (see playbook.yml). Installing asdf here is slow and brittle, so system
+# runtimes on PATH stand in — this exercises the role's PATH-based installs
+# for every provider, just not the asdf shim resolution itself.
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Install provider runtimes for testing
+      apt:
+        name:
+          - python3-venv
+          - npm
+          - ruby
+          - ruby-dev # build the neovim gem's native msgpack extension
+          - cpanminus # provides cpanm; pulls in perl
+          - libperl-dev # build the Neovim::Ext perl module's XS deps
+          - build-essential # compiler/make for the native gem and cpan builds
+        state: present
+        update_cache: true
+
+    - name: Create a python venv for the pynvim provider
+      command: python3 -m venv /opt/nvenv
+      args:
+        creates: /opt/nvenv/bin/python
+
+    - name: Symlink venv pip so bare 'pip' resolves to it
+      file:
+        src: /opt/nvenv/bin/pip
+        dest: /usr/local/bin/pip
+        state: link
+
+    - name: Ensure local bin directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/.local/bin"
+        state: directory
+        mode: "0755"

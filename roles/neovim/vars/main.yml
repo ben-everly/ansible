@@ -1,0 +1,6 @@
+---
+neovim_provider_verify:
+  pip: pip show pynvim
+  gem: gem list -i neovim
+  npm: npm ls -g neovim
+  cpanm: perl -MNeovim::Ext -e 1

@@ -9,13 +9,19 @@ def test_wezterm_binary(host):
     assert f.mode & 0o111
 
 
+# key from https://apt.fury.io/wez/gpg.key, captured 2026-06-07
+# no independent fingerprint published upstream (ships via Gemfury; trust-on-first-use)
+WEZTERM_KEY_FPR = "0CA603116C960BAFB2BF310BD7BA31CF90C4B319"
+
+
 def test_wezterm_keyring_present(host):
     keyring = "/etc/apt/keyrings/wezterm.asc"
     f = host.file(keyring)
     assert f.exists
     assert f.size > 0
-    cmd = host.run(f"gpg --show-keys {keyring}")
+    cmd = host.run(f"gpg --show-keys --with-colons {keyring}")
     assert cmd.rc == 0, f"gpg --show-keys failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
+    assert WEZTERM_KEY_FPR in cmd.stdout, f"unexpected key fingerprint: {cmd.stdout!r}"
 
 
 def test_wezterm_repo_configured(host):

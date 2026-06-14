@@ -7,15 +7,23 @@
     - /etc/apt/trusted.gpg.d/wezterm.asc
     - /etc/apt/sources.list.d/wezterm.list
 
+- name: Install wezterm signing key
+  become: true
+  copy:
+    src: wezterm.asc
+    dest: /etc/apt/keyrings/wezterm.asc
+    mode: "0644"
+
 - name: Add wezterm repository
   become: true
   deb822_repository:
     name: wezterm
     types: deb
     uris: https://apt.fury.io/wez/
+    # flat Gemfury repo; wezterm documents the "* *" wildcards
     suites: "*"
     components: "*"
-    signed_by: https://apt.fury.io/wez/gpg.key
+    signed_by: /etc/apt/keyrings/wezterm.asc
     install_python_debian: true
 
 - name: Install apt packages

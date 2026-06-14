@@ -29,22 +29,24 @@
 
     - name: Download tomb
       get_url:
-        url: https://files.dyne.org/tomb/releases/Tomb-2.9.tar.gz
+        url: "https://files.dyne.org/tomb/releases/Tomb-{{ tomb_version }}.tar.gz"
         dest: "{{ tmp_dir.path }}/tomb.tar.gz"
-      register: tomb_file
+        checksum: "sha256:{{ tomb_sha256 }}"
 
-    - name: Unzip tomb_file
-      shell: tar xvfz ./tomb.tar.gz
-      args:
-        chdir: "{{ tmp_dir.path }}"
+    - name: Extract tomb
+      unarchive:
+        src: "{{ tmp_dir.path }}/tomb.tar.gz"
+        dest: "{{ tmp_dir.path }}"
+        remote_src: true
 
     - name: Run make
       become: true
       make:
-        chdir: "{{ tmp_dir.path }}/Tomb-2.9"
+        chdir: "{{ tmp_dir.path }}/Tomb-{{ tomb_version }}"
         target: install
-
+  always:
     - name: Remove tmp dir
       file:
         path: "{{ tmp_dir.path }}"
         state: absent
+      when: tmp_dir.path is defined

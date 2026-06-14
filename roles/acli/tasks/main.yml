@@ -8,6 +8,13 @@
     - /etc/apt/keyrings/acli-archive-keyring.gpg
     - /etc/apt/sources.list.d/acli.list
 
+- name: Install acli signing key
+  become: true
+  copy:
+    src: acli.asc
+    dest: /etc/apt/keyrings/acli.asc
+    mode: "0644"
+
 - name: Add acli repository
   become: true
   deb822_repository:
@@ -16,7 +23,7 @@
     uris: https://acli.atlassian.com/linux/deb
     suites: stable
     components: main
-    signed_by: https://acli.atlassian.com/gpg/public-key.asc
+    signed_by: /etc/apt/keyrings/acli.asc
     install_python_debian: true
 
 - name: Install acli

@@ -12,46 +12,79 @@
     url: https://api.github.com/repos/neovim/neovim/releases/latest
   register: neovim
 
+# upstream publishes no checksums or signatures for release assets
+# (checked v0.12.x), so HTTPS is the only integrity guarantee available
 - name: Download nvim appimage
   get_url:
     url: "{{ neovim.json.assets | selectattr('name', 'equalto', 'nvim-linux-x86_64.appimage') | map(attribute='browser_download_url') | first }}"
     dest: $HOME/.local/bin/nvim
     mode: "755"
 
-- name: Install pip packages
-  pip:
-    name: pynvim
-    state: latest
-    executable: $HOME/.asdf/shims/pip
+- name: Check which provider runtimes are on PATH
+  shell: "command -v {{ item }}"
+  loop: "{{ neovim_provider_runtimes }}"
+  register: provider_checks
+  changed_when: false
+  failed_when: false
 
-- name: Install pip2 packages
+- name: Resolve which provider runtimes are available
+  set_fact:
+    providers_present: "{{ provider_checks.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
+
+- name: Install pip packages
+  when: "'pip' in providers_present"
   pip:
     name: pynvim
     state: latest
-    executable: $HOME/.asdf/shims/pip2
+    executable: pip
 
 - name: Install ruby packages
+  when: "'gem' in providers_present"
   gem:
     name: neovim
     state: latest
-    executable: $HOME/.asdf/shims/gem
+    executable: gem
 
-- name: Install node neovim package
+- name: Install node neovim packages
+  when: "'npm' in providers_present"
   npm:
     name: "{{ item }}"
     global: true
     state: latest
-    executable: $HOME/.asdf/shims/npm
+    executable: npm
   with_items:
     - neovim
     - yarn
     - tree-sitter-cli
 
 - name: Install cpan packages
+  when: "'cpanm' in providers_present"
   cpanm:
     name: "{{ item }}"
     notest: true
-    executable: $HOME/.asdf/shims/cpanm
+    executable: cpanm
   with_items:
     - Neovim::Ext
-    - App::cpanminus
+
+- name: Verify provider packages installed
+  shell: "{{ neovim_provider_verify[item] }}"
+  loop: "{{ providers_present }}"
+  register: provider_verifications
+  changed_when: false
+  failed_when: false
+
+- name: Surface provider runtimes that did not install
+  vars:
+    verified_providers: "{{ provider_verifications.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
+    failed_providers: "{{ neovim_provider_runtimes | difference(verified_providers) }}"
+    failed_required: "{{ failed_providers | intersect(neovim_required_providers) }}"
+  block:
+    - name: Warn about provider runtimes that did not install
+      debug:
+        msg: "neovim provider runtimes unavailable or failed to install: {{ failed_providers | join(', ') }}"
+      when: failed_providers | length > 0
+
+    - name: Fail when a required provider did not install
+      fail:
+        msg: "required neovim providers missing or failed to install: {{ failed_required | join(', ') }}"
+      when: failed_required | length > 0

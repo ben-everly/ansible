@@ -1,44 +1,76 @@
-- name: Create directory for {{ font }}
-  file:
-    path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
-    mode: 0775
-    state: directory
-
-- name: Github api version check for {{ font }}
-  uri:
-    url: "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest"
-    return_content: true
-  register: latest_version
+- name: Assert a pinned checksum exists for {{ font }}
+  assert:
+    that:
+      - font in nerd_fonts_sha256
+    fail_msg: >-
+      No pinned sha256 for {{ font }} in nerd_fonts_sha256
+      (roles/nerd-fonts/defaults/main.yml). Add the {{ font }}.tar.xz checksum
+      from the {{ nerd_fonts_version }} SHA-256.txt before installing.
 
 - name: Reset current version to '0.0.0'
   set_fact:
     current_version: "0.0.0"
 
+- name: Stat current version file for {{ font }}
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
+  register: current_version_file
+
 - name: Read current version file for {{ font }}
   slurp:
     src: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
   register: current_version_file_content
-  ignore_errors: true
+  when: current_version_file.stat.exists
 
 - name: Set current version for {{ font }}
   set_fact:
     current_version: "{{ current_version_file_content.content | b64decode | trim }}"
-  when: current_version_file_content is defined and current_version_file_content.content is defined
+  when: current_version_file.stat.exists
 
 - name: Debug current version for {{ font }}
   debug:
     msg: "Current version of {{ font }} is {{ current_version }}"
 
-- name: Download and extract {{ font }}
-  ansible.builtin.unarchive:
-    src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/{{ font }}.tar.xz"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
-    remote_src: true
-  when: latest_version.json.tag_name != current_version
+- name: Install {{ font }} {{ nerd_fonts_version }}
+  when: nerd_fonts_version != current_version
+  block:
+    - name: Make temp dir for {{ font }}
+      tempfile:
+        state: directory
+      register: font_tmp
 
-- name: Write latest version to file for {{ font }}
-  copy:
-    content: "{{ latest_version.json.tag_name }}"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
-    mode: "0644"
-  when: latest_version.json.tag_name != current_version
+    - name: Download {{ font }}
+      get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ font }}.tar.xz"
+        dest: "{{ font_tmp.path }}/{{ font }}.tar.xz"
+        checksum: "sha256:{{ nerd_fonts_sha256[font] }}"
+
+    # reset the dir so files renamed or removed upstream don't linger across releases
+    - name: Reset font directory for {{ font }}
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        state: absent
+
+    - name: Create directory for {{ font }}
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        mode: "0775"
+        state: directory
+
+    - name: Extract {{ font }}
+      ansible.builtin.unarchive:
+        src: "{{ font_tmp.path }}/{{ font }}.tar.xz"
+        dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}"
+        remote_src: true
+
+    - name: Write latest version to file for {{ font }}
+      copy:
+        content: "{{ nerd_fonts_version }}"
+        dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ font }}/_version.txt"
+        mode: "0644"
+  always:
+    - name: Remove temp dir for {{ font }}
+      file:
+        path: "{{ font_tmp.path }}"
+        state: absent
+      when: font_tmp.path is defined

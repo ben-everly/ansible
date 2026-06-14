@@ -1,5 +1,5 @@
 - name: Find current version of handy
-  shell: dpkg -s handy | grep Version | awk '{print $2}'
+  command: dpkg-query -W -f='${Version}' handy
   register: current_version
   failed_when: false
   changed_when: false
@@ -12,6 +12,16 @@
 - name: Install handy
   when: current_version.stdout != (handy_release.json.tag_name | replace('v', ''))
   block:
+    - name: Assert release publishes the expected amd64 deb and signature
+      assert:
+        that:
+          - handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb$') | list | length == 1
+          - handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb[.]sig$') | list | length == 1
+        fail_msg: >-
+          Release {{ handy_release.json.tag_name }} is missing the expected
+          amd64 .deb and/or .deb.sig asset; refusing to install unverified.
+          Assets found: {{ handy_release.json.assets | map(attribute='name') | list }}
+
     - name: Make temp dir
       tempfile:
         state: directory
@@ -19,19 +29,63 @@
 
     - name: Set asset
       set_fact:
-        asset: "{{ handy_release.json.assets | selectattr('name', 'match', '.*amd64.deb') | first }}"
+        asset: "{{ handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb$') | first }}"
+        sig_asset: "{{ handy_release.json.assets | selectattr('name', 'match', '.*amd64[.]deb[.]sig$') | first }}"
+
+    - name: Install minisign for signature verification
+      become: true
+      apt:
+        name: minisign
+        state: present
+        update_cache: true
 
     - name: Download handy
       get_url:
         url: "{{ asset.browser_download_url }}"
         dest: "{{ tmp_dir.path }}/{{ asset.name }}"
 
+    - name: Download handy signature
+      get_url:
+        url: "{{ sig_asset.browser_download_url }}"
+        dest: "{{ tmp_dir.path }}/{{ sig_asset.name }}"
+
+    - name: Decode tauri signature to minisign format
+      shell: base64 -d {{ (tmp_dir.path ~ '/' ~ sig_asset.name) | quote }} > {{ tmp_dir.path }}/handy.minisig
+      changed_when: false
+
+    - name: Verify handy signature against pinned key
+      command:
+        argv:
+          - minisign
+          - -V
+          - -P
+          - "{{ handy_minisign_pubkey }}"
+          - -m
+          - "{{ tmp_dir.path }}/{{ asset.name }}"
+          - -x
+          - "{{ tmp_dir.path }}/handy.minisig"
+      register: handy_verify
+      changed_when: false
+      failed_when: false
+
+    - name: Assert the signature verified against the pinned key
+      assert:
+        that:
+          - handy_verify.rc == 0
+        fail_msg: >-
+          minisign could not verify {{ asset.name }} against the pinned key.
+          If cjpais/Handy rotated its Tauri updater key, re-pin
+          handy_minisign_pubkey (roles/handy/defaults/main.yml) from
+          src-tauri/tauri.conf.json after re-establishing trust.
+          minisign: {{ handy_verify.stderr }}
+
     - name: Install handy
       apt:
         deb: "{{ tmp_dir.path }}/{{ asset.name }}"
       become: true
-
+  always:
     - name: Remove temp dir
       file:
         path: "{{ tmp_dir.path }}"
         state: absent
+      when: tmp_dir.path is defined

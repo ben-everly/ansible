@@ -15,13 +15,19 @@ def test_acli_version(host):
     assert "version" in cmd.stdout.lower(), f"unexpected output: {cmd.stdout!r}"
 
 
+# key from https://acli.atlassian.com/gpg/public-key.asc, captured 2026-06-07
+# no independent fingerprint published upstream (trust-on-first-use)
+ACLI_KEY_FPR = "A99C71D268433EDC13CC885FFA73568DB7ADDBBB"
+
+
 def test_acli_keyring_present(host):
     keyring = "/etc/apt/keyrings/acli.asc"
     f = host.file(keyring)
     assert f.exists
     assert f.size > 0
-    cmd = host.run(f"gpg --show-keys {keyring}")
+    cmd = host.run(f"gpg --show-keys --with-colons {keyring}")
     assert cmd.rc == 0, f"gpg --show-keys failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
+    assert ACLI_KEY_FPR in cmd.stdout, f"unexpected key fingerprint: {cmd.stdout!r}"
 
 
 def test_acli_repo_configured(host):

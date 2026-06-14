@@ -3,7 +3,7 @@
   hosts: all
   become: true
   tasks:
-    - name: Install git (required dependency for gh-cli)
+    - name: Install git (required dependency for github-cli)
       apt:
         name: git
         state: present

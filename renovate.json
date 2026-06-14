@@ -5,9 +5,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["roles/pulumi/defaults/main.yml"],
+      "managerFilePatterns": ["roles/*/defaults/main.yml"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+pulumi_cosign_version:\\s*\"(?<currentValue>.+?)\""
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\s+\\w+_version:\\s*\"(?<currentValue>.+?)\""
       ]
     }
   ]

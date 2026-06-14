@@ -31,18 +31,18 @@ endif
 
 converge:
 ifndef ROLE
-	$(error ROLE is required for converge, e.g. make converge ROLE=gh-cli)
+	$(error ROLE is required for converge, e.g. make converge ROLE=github-cli)
 endif
 	cd roles/$(ROLE) && molecule converge
 
 verify:
 ifndef ROLE
-	$(error ROLE is required for verify, e.g. make verify ROLE=gh-cli)
+	$(error ROLE is required for verify, e.g. make verify ROLE=github-cli)
 endif
 	cd roles/$(ROLE) && molecule verify
 
 destroy:
 ifndef ROLE
-	$(error ROLE is required for destroy, e.g. make destroy ROLE=gh-cli)
+	$(error ROLE is required for destroy, e.g. make destroy ROLE=github-cli)
 endif
 	cd roles/$(ROLE) && molecule destroy
