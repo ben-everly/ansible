@@ -1,0 +1,10 @@
+---
+# renovate: datasource=github-tags depName=aws/aws-cli
+aws_cli_version: "2.35.4"
+# sha256 of awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip.
+# Provenance: PGP-verified once at pin time against the AWS CLI public key
+# (fingerprint FB5D B77F D5C1 18B8 0511 ADA8 A631 0ACC 4672 475C, confirmed against
+# https://docs.aws.amazon.com/cli/latest/userguide/getting-started-version.html),
+# sig at https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip.sig
+# Re-verify + re-pin on version bump.
+aws_cli_sha256: "eb037f2df27b653b24b7942fdd7c62bb350354a906c16f70e82d92a2ce49084b"
