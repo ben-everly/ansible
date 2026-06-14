@@ -1,7 +1,12 @@
 import pytest
 
-# from https://cli.github.com/packages/githubcli-archive-keyring.gpg, captured 2026-06-07
-GH_KEY_FPR = "2C6106201985B60E6C7AC87323F3D4EA75716059"
+# key from https://cli.github.com/packages/githubcli-archive-keyring.gpg, captured 2026-06-13
+# fingerprints corroborated in https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+# 2C61... signs today but expires 2026-09-05; 7F38... is the successor key
+GH_KEY_FPRS = [
+    "2C6106201985B60E6C7AC87323F3D4EA75716059",
+    "7F38BBB59D064DBCB3D84D725612B36462313325",
+]
 
 
 def test_gh_keyring_present(host):
@@ -11,7 +16,8 @@ def test_gh_keyring_present(host):
     assert f.size > 0
     cmd = host.run(f"gpg --show-keys --with-colons {keyring}")
     assert cmd.rc == 0, f"gpg --show-keys failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
-    assert GH_KEY_FPR in cmd.stdout, f"unexpected key fingerprint: {cmd.stdout!r}"
+    for fpr in GH_KEY_FPRS:
+        assert fpr in cmd.stdout, f"missing expected key {fpr}: {cmd.stdout!r}"
 
 
 def test_gh_no_stale_module_keyring(host):
