@@ -10,7 +10,8 @@ def test_enpass_binary(host):
     assert f.mode & 0o111
 
 
-# from https://apt.enpass.io/keys/enpass-linux.key, captured 2026-06-07
+# key from https://apt.enpass.io/keys/enpass-linux.key, captured 2026-06-07
+# no independent fingerprint published upstream (trust-on-first-use)
 ENPASS_KEY_FPR = "F433834B65BE665BCE974660877653760D0214BC"
 
 

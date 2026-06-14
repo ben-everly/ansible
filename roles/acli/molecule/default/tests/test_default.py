@@ -15,7 +15,8 @@ def test_acli_version(host):
     assert "version" in cmd.stdout.lower(), f"unexpected output: {cmd.stdout!r}"
 
 
-# from https://acli.atlassian.com/gpg/public-key.asc, captured 2026-06-07
+# key from https://acli.atlassian.com/gpg/public-key.asc, captured 2026-06-07
+# no independent fingerprint published upstream (trust-on-first-use)
 ACLI_KEY_FPR = "A99C71D268433EDC13CC885FFA73568DB7ADDBBB"
 
 

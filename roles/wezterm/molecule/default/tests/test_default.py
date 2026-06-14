@@ -9,7 +9,8 @@ def test_wezterm_binary(host):
     assert f.mode & 0o111
 
 
-# from https://apt.fury.io/wez/gpg.key, captured 2026-06-07
+# key from https://apt.fury.io/wez/gpg.key, captured 2026-06-07
+# no independent fingerprint published upstream (ships via Gemfury; trust-on-first-use)
 WEZTERM_KEY_FPR = "0CA603116C960BAFB2BF310BD7BA31CF90C4B319"
 
 

@@ -1,3 +1,4 @@
+# key from https://apt.releases.hashicorp.com/gpg, captured 2026-06-07
 # verify at https://www.hashicorp.com/security (Linux Package Verification)
 VAGRANT_KEY_FPR = "798AEC654E5C15428C8E42EEAA16FCBCA621E701"
 
