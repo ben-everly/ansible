@@ -1,4 +1,9 @@
 ---
+- name: Assert aws-cli supports this architecture
+  assert:
+    that: ansible_architecture == "x86_64"
+    fail_msg: "aws role only supports x86_64 (got {{ ansible_architecture }})"
+
 - name: Check if aws-cli is installed
   shell:
     cmd: which aws
