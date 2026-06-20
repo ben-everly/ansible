@@ -1,0 +1,41 @@
+---
+# Seed an older aws-cli so converge must UPGRADE it to the pinned version.
+# This exercises the version gate's upgrade path (installed != pin), which the
+# default scenario's fresh install does not cover.
+- name: Prepare
+  hosts: all
+  become: true
+  vars:
+    aws_cli_old_version: "2.30.0" # older than the pin; keep in sync with tests/test_default.py
+  tasks:
+    - name: Install unzip for the fixture
+      apt:
+        name: unzip
+        state: present
+        update_cache: true
+
+    - name: Make fixture temp dir
+      tempfile:
+        state: directory
+      register: fixture_tmp
+
+    - name: Download an older aws-cli to upgrade from
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_old_version }}.zip"
+        dest: "{{ fixture_tmp.path }}/awscliv2.zip"
+
+    - name: Extract older aws-cli
+      unarchive:
+        src: "{{ fixture_tmp.path }}/awscliv2.zip"
+        dest: "{{ fixture_tmp.path }}"
+        remote_src: true
+
+    - name: Install older aws-cli
+      command:
+        cmd: "{{ fixture_tmp.path }}/aws/install"
+        creates: /usr/local/bin/aws
+
+    - name: Remove fixture temp dir
+      file:
+        path: "{{ fixture_tmp.path }}"
+        state: absent
