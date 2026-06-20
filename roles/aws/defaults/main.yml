@@ -5,3 +5,5 @@ aws_cli_version: "2.35.4"
 # Vendored 2026-06-15; expires 2026-07-07. On expiry, re-export AWS's refreshed
 # key and re-confirm its fingerprint against the published value at
 # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-version.html
+# Asserted at install time against the imported key, so a botched re-vendor fails loudly.
+aws_cli_key_fingerprint: "FB5DB77FD5C118B80511ADA8A6310ACC4672475C"

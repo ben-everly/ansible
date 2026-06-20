@@ -56,6 +56,19 @@
         cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --import {{ tmp_dir.path }}/aws-cli.asc"
       changed_when: false
 
+    - name: Read fingerprints from the throwaway keyring
+      command:
+        cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --with-colons --fingerprint"
+      changed_when: false
+      register: aws_cli_keyring
+
+    # Catches a botched key rotation before we trust the imported key to verify
+    # the download — re-confirm aws_cli_key_fingerprint against AWS's published value.
+    - name: Assert the imported key matches the expected fingerprint
+      assert:
+        that: aws_cli_key_fingerprint in aws_cli_keyring.stdout
+        fail_msg: "vendored aws-cli signing key fingerprint mismatch (expected {{ aws_cli_key_fingerprint }})"
+
     - name: Download aws-cli v2 zip
       get_url:
         url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip"
