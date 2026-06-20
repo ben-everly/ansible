@@ -4,15 +4,26 @@
     that: ansible_architecture == "x86_64"
     fail_msg: "aws role only supports x86_64 (got {{ ansible_architecture }})"
 
-- name: Check if aws-cli is installed
-  shell:
-    cmd: which aws
+- name: Check installed aws-cli version
+  command:
+    cmd: aws --version
   changed_when: false
-  failed_when: result.rc != 0 and result.rc != 1
-  register: result
+  failed_when: false
+  register: aws_installed_version
 
+# aws --version prints to stdout; fold in stderr to stay robust. regex_search
+# with a capture group yields a list, so first/default extracts the version
+# string (or '' when aws is absent).
+- name: Determine the installed aws-cli version
+  set_fact:
+    aws_installed_cli_version: >-
+      {{ ((aws_installed_version.stdout | default('')) ~ (aws_installed_version.stderr | default('')))
+      | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}
+
+# Reinstall whenever the running version differs from the pin, so a bump to
+# aws_cli_version actually upgrades an already-provisioned host, not just fresh ones.
 - name: Install aws-cli
-  when: result.rc == 1
+  when: aws_installed_cli_version != aws_cli_version
   block:
     - name: Install apt packages
       become: true
@@ -67,11 +78,13 @@
         dest: "{{ tmp_dir.path }}"
         remote_src: true
 
+    # --update lets the installer overwrite an existing install; it is also a
+    # no-op-safe flag on a fresh box. The version gate above is what guards
+    # idempotence, so no creates: here.
     - name: Run aws-cli installer
       become: true
       command:
-        cmd: "{{ tmp_dir.path }}/aws/install"
-        creates: /usr/local/bin/aws
+        cmd: "{{ tmp_dir.path }}/aws/install --update"
   always:
     - name: Remove tmp dir
       file:
