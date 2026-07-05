@@ -1,5 +1,5 @@
 ---
 # renovate: datasource=github-tags depName=dyne/Tomb extractVersion=^v(?<version>.*)$
-tomb_version: "2.9"
+tomb_version: "2.13"
 # sha256 of Tomb-{{ tomb_version }}.tar.gz; re-pin when bumping tomb_version
-tomb_sha256: "b3a23c6680815f7557a3c4bd73d2b2dbde870a62357fcbf9b33089afae75d68c"
+tomb_sha256: "0f78fb78b19edba944dae1a67c8abb9041e33a1805d5b8b0c72b4424019f0590"
