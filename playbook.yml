@@ -105,6 +105,7 @@
     - role: opencode
     - role: handy
     - role: acli
+    - role: cloudflared
   tasks:
     - name: apt update
       become: true
