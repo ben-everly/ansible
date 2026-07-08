@@ -25,6 +25,15 @@ def test_gh_no_stale_module_keyring(host):
     assert not host.file("/etc/apt/keyrings/github-cli.gpg").exists
 
 
+def test_gh_repo_configured(host):
+    f = host.file("/etc/apt/sources.list.d/github-cli.sources")
+    assert f.exists
+    content = f.content_string
+    assert "URIs: https://cli.github.com/packages" in content
+    # repo must be scoped to its own key, not globally-trusted
+    assert "Signed-By: /etc/apt/keyrings/github-cli.asc" in content
+
+
 def test_gh_binary_exists(host):
     gh = host.file("/usr/bin/gh")
     assert gh.exists
