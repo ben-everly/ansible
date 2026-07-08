@@ -1,0 +1,24 @@
+- name: Install cloudflared signing key
+  become: true
+  copy:
+    src: cloudflare-main.asc
+    dest: /etc/apt/keyrings/cloudflare-main.asc
+    mode: "0644"
+
+- name: Add cloudflared repository
+  become: true
+  deb822_repository:
+    name: cloudflared
+    types: deb
+    uris: https://pkg.cloudflare.com/cloudflared
+    suites: any
+    components: main
+    signed_by: /etc/apt/keyrings/cloudflare-main.asc
+    install_python_debian: true
+
+- name: Install cloudflared
+  become: true
+  apt:
+    name: cloudflared
+    state: latest
+    update_cache: true
