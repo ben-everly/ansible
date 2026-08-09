@@ -1,5 +1,25 @@
 ---
-- name: Install claude-code cli
-  community.general.npm:
-    name: '@anthropic-ai/claude-code'
-    global: yes
+- name: Install claude-code signing key
+  become: true
+  copy:
+    src: claude-code.asc
+    dest: /etc/apt/keyrings/claude-code.asc
+    mode: "0644"
+
+- name: Add claude-code repository
+  become: true
+  deb822_repository:
+    name: claude-code
+    types: deb
+    uris: https://downloads.claude.ai/claude-code/apt/stable
+    suites: stable
+    components: main
+    signed_by: /etc/apt/keyrings/claude-code.asc
+    install_python_debian: true
+
+- name: Install claude-code
+  become: true
+  apt:
+    name: claude-code
+    state: latest
+    update_cache: true
