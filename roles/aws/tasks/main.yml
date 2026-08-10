@@ -70,14 +70,18 @@
     # the download — re-confirm aws_cli_key_fingerprint against AWS's published value.
     # The pub-count check is what makes the fingerprint match meaningful: gpg lists
     # every key in the keyring, so a second key appended to the vendored .asc would
-    # satisfy a bare substring match and then be trusted to sign the download.
+    # otherwise sit alongside the expected one and still be trusted to sign the download.
+    # The fingerprint is compared against the fpr: record — the value gpg computes from
+    # the key material — not against the whole dump, which also carries uid text copied
+    # verbatim from the .asc: a key naming the expected fingerprint in its uid would
+    # satisfy a bare substring match while hashing to something else entirely.
     # The validity check turns the documented "re-vendor on expiry" step into
     # something enforced — gpg --verify alone still exits 0 under an expired key.
     - name: Assert the keyring holds only the expected, still-valid key
       assert:
         that:
           - aws_cli_keyring.stdout | regex_findall('^pub:', multiline=True) | length == 1
-          - aws_cli_key_fingerprint in aws_cli_keyring.stdout
+          - aws_cli_keyring.stdout | regex_findall('^fpr:::::::::([0-9A-F]+):', multiline=True) | first == aws_cli_key_fingerprint
           - aws_cli_keyring.stdout | regex_findall('^pub:([^:]*):', multiline=True) | first not in ['e', 'r']
         fail_msg: >-
           vendored aws-cli signing key must be exactly one valid key with fingerprint
