@@ -4,9 +4,12 @@
     that: ansible_architecture == "x86_64"
     fail_msg: "aws role only supports x86_64 (got {{ ansible_architecture }})"
 
+# Probe the path the installer owns, not bare `aws` on PATH: the play prepends
+# asdf shims, and a legacy /snap/bin/aws may still linger on provisioned hosts.
+# Either could answer for a version this role does not manage.
 - name: Check installed aws-cli version
   command:
-    cmd: aws --version
+    cmd: /usr/local/bin/aws --version
   changed_when: false
   failed_when: false
   check_mode: no
