@@ -31,5 +31,5 @@ def test_aws_upgraded_to_pinned_version(host):
     cmd = host.run("aws --version")
     assert cmd.rc == 0, f"aws --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
     combined = cmd.stdout + cmd.stderr
-    assert AWS_CLI_VERSION in combined, f"expected pinned version, got: {combined!r}"
-    assert AWS_CLI_OLD_VERSION not in combined, f"old version still present: {combined!r}"
+    assert f"aws-cli/{AWS_CLI_VERSION}" in combined, f"expected pinned version, got: {combined!r}"
+    assert f"aws-cli/{AWS_CLI_OLD_VERSION}" not in combined, f"old version still present: {combined!r}"

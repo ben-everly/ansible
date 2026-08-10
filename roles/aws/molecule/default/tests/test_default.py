@@ -23,4 +23,4 @@ def test_aws_version(host):
     cmd = host.run("aws --version")
     assert cmd.rc == 0, f"aws --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
     combined = cmd.stdout + cmd.stderr
-    assert AWS_CLI_VERSION in combined, f"unexpected aws version output: {combined!r}"
+    assert f"aws-cli/{AWS_CLI_VERSION}" in combined, f"unexpected aws version output: {combined!r}"
