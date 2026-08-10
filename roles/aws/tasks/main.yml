@@ -104,6 +104,16 @@
       become: true
       command:
         cmd: "{{ tmp_dir.path }}/aws/install --update"
+
+    # The installer exits 0 without repointing its symlinks when its target version
+    # directory already exists, so a run that "succeeded" can leave aws absent or on
+    # the wrong version.
+    - name: Confirm the installer produced the pinned version
+      command:
+        cmd: /usr/local/bin/aws --version
+      changed_when: false
+      failed_when: "'aws-cli/' + aws_cli_version not in (aws_post_install.stdout | default('')) + (aws_post_install.stderr | default(''))"
+      register: aws_post_install
   always:
     - name: Remove tmp dir
       file:
