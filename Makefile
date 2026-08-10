@@ -1,15 +1,19 @@
 MOLECULE_ROLES := $(sort $(patsubst roles/%/molecule/default/molecule.yml,%,$(wildcard roles/*/molecule/default/molecule.yml)))
 
+# Roles are discovered by their default scenario, but --all runs every scenario
+# a role defines, so extra scenarios (e.g. aws/upgrade) are not silently skipped.
+SCENARIO ?= default
+
 .PHONY: test converge verify destroy
 
 test:
 ifdef ROLE
-	cd roles/$(ROLE) && molecule test
+	cd roles/$(ROLE) && molecule test --all
 else
 	@passed=""; failed=""; \
 	for role in $(MOLECULE_ROLES); do \
 		echo "==> Testing role: $$role"; \
-		if (cd roles/$$role && molecule test); then \
+		if (cd roles/$$role && molecule test --all); then \
 			passed="$$passed $$role"; \
 		else \
 			failed="$$failed $$role"; \
@@ -33,16 +37,16 @@ converge:
 ifndef ROLE
 	$(error ROLE is required for converge, e.g. make converge ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule converge
+	cd roles/$(ROLE) && molecule converge -s $(SCENARIO)
 
 verify:
 ifndef ROLE
 	$(error ROLE is required for verify, e.g. make verify ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule verify
+	cd roles/$(ROLE) && molecule verify -s $(SCENARIO)
 
 destroy:
 ifndef ROLE
 	$(error ROLE is required for destroy, e.g. make destroy ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule destroy
+	cd roles/$(ROLE) && molecule destroy -s $(SCENARIO)

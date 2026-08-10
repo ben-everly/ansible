@@ -51,6 +51,8 @@ Run tests for a specific role:
 make test ROLE=github-cli
 ```
 
+Both run every scenario a role defines, not just `default`.
+
 Run individual stages (useful during development):
 
 ```sh
@@ -59,11 +61,17 @@ make verify ROLE=bottom     # run testinfra tests
 make destroy ROLE=bottom    # tear down the container
 ```
 
+These act on the `default` scenario. Pass `SCENARIO` to target another one:
+
+```sh
+make converge ROLE=aws SCENARIO=upgrade
+```
+
 Alternatively, run molecule directly from the role directory:
 
 ```sh
 cd roles/<role-name>
-molecule test
+molecule test --all
 ```
 
 ### Roles with Molecule Scenarios
@@ -74,6 +82,12 @@ Not all roles have molecule tests yet. Roles with tests have a `molecule/default
 - `converge.yml` — playbook that applies the role
 - `tests/test_default.py` — testinfra assertions
 - `prepare.yml` (optional) — pre-test setup (e.g. installing dependencies)
+
+A role may add further scenarios alongside `default` to cover paths a fresh
+container cannot reach — `roles/aws/molecule/upgrade/`, for instance, seeds an
+older aws-cli so the role's version gate must upgrade it. `make test` runs them
+all; role discovery still keys off `molecule/default/`, so every tested role
+needs a `default` scenario.
 
 ### Environment Variables
 

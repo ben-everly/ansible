@@ -2,13 +2,28 @@ from pathlib import Path
 
 import yaml
 
+SCENARIO_DIR = Path(__file__).parents[1]
+
 # expected version comes from the role's pin, so a bump edits one place
 AWS_CLI_VERSION = yaml.safe_load(
-    (Path(__file__).parents[3] / "defaults" / "main.yml").read_text()
+    (SCENARIO_DIR.parents[1] / "defaults" / "main.yml").read_text()
 )["aws_cli_version"]
 
-# the older version prepare.yml seeds; keep in sync with prepare.yml
-AWS_CLI_OLD_VERSION = "2.30.0"
+# the older version prepare.yml seeds, read from prepare.yml itself so the two
+# can never drift apart
+AWS_CLI_OLD_VERSION = yaml.safe_load((SCENARIO_DIR / "prepare.yml").read_text())[0][
+    "vars"
+]["aws_cli_version"]
+
+
+def test_fixture_seeds_an_older_version():
+    # Guards the scenario itself: if the seeded version ever reaches the pin,
+    # converge's version gate closes and the upgrade assertion below would pass
+    # without any upgrade having happened.
+    assert AWS_CLI_OLD_VERSION != AWS_CLI_VERSION, (
+        f"prepare.yml seeds {AWS_CLI_OLD_VERSION}, which is the pinned version — "
+        "this scenario would no longer exercise an upgrade"
+    )
 
 
 def test_aws_upgraded_to_pinned_version(host):

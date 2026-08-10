@@ -9,6 +9,7 @@
     cmd: aws --version
   changed_when: false
   failed_when: false
+  check_mode: no
   register: aws_installed_version
 
 # aws --version prints to stdout; fold in stderr to stay robust. regex_search
@@ -64,10 +65,20 @@
 
     # Catches a botched key rotation before we trust the imported key to verify
     # the download — re-confirm aws_cli_key_fingerprint against AWS's published value.
-    - name: Assert the imported key matches the expected fingerprint
+    # The pub-count check is what makes the fingerprint match meaningful: gpg lists
+    # every key in the keyring, so a second key appended to the vendored .asc would
+    # satisfy a bare substring match and then be trusted to sign the download.
+    # The validity check turns the documented "re-vendor on expiry" step into
+    # something enforced — gpg --verify alone still exits 0 under an expired key.
+    - name: Assert the keyring holds only the expected, still-valid key
       assert:
-        that: aws_cli_key_fingerprint in aws_cli_keyring.stdout
-        fail_msg: "vendored aws-cli signing key fingerprint mismatch (expected {{ aws_cli_key_fingerprint }})"
+        that:
+          - aws_cli_keyring.stdout | regex_findall('^pub:', multiline=True) | length == 1
+          - aws_cli_key_fingerprint in aws_cli_keyring.stdout
+          - aws_cli_keyring.stdout | regex_findall('^pub:([^:]*):', multiline=True) | first not in ['e', 'r']
+        fail_msg: >-
+          vendored aws-cli signing key must be exactly one valid key with fingerprint
+          {{ aws_cli_key_fingerprint }} — re-vendor it from AWS's published key
 
     - name: Download aws-cli v2 zip
       get_url:
