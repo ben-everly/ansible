@@ -16,14 +16,14 @@ AWS_CLI_OLD_VERSION = yaml.safe_load((SCENARIO_DIR / "prepare.yml").read_text())
 ]["aws_cli_version"]
 
 
-def test_fixture_seeds_an_older_version():
-    # Guards the scenario itself: if the seeded version ever reaches the pin,
-    # converge's version gate closes and the upgrade assertion below would pass
-    # without any upgrade having happened.
-    assert AWS_CLI_OLD_VERSION != AWS_CLI_VERSION, (
-        f"prepare.yml seeds {AWS_CLI_OLD_VERSION}, which is the pinned version — "
-        "this scenario would no longer exercise an upgrade"
-    )
+def test_upgrade_replaced_the_seeded_install(host):
+    # The installer never removes the version it upgraded from, so both trees
+    # surviving with current repointed is the signature of a real upgrade —
+    # something a converge that merely reinstalled the pin cannot produce.
+    assert host.file(f"/usr/local/aws-cli/v2/{AWS_CLI_OLD_VERSION}").is_directory
+    current = host.file("/usr/local/aws-cli/v2/current")
+    assert current.is_symlink
+    assert current.linked_to == f"/usr/local/aws-cli/v2/{AWS_CLI_VERSION}"
 
 
 def test_aws_upgraded_to_pinned_version(host):
