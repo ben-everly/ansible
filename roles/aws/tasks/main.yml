@@ -4,9 +4,8 @@
     that: ansible_architecture == "x86_64"
     fail_msg: "aws role only supports x86_64 (got {{ ansible_architecture }})"
 
-# Probe the path the installer owns, not bare `aws` on PATH: the play prepends
-# asdf shims, and a legacy /snap/bin/aws may still linger on provisioned hosts.
-# Either could answer for a version this role does not manage.
+# Bare `aws` on PATH can resolve to an asdf shim or a legacy /snap/bin/aws, neither
+# of which this role manages.
 - name: Check installed aws-cli version
   command:
     cmd: /usr/local/bin/aws --version
@@ -15,17 +14,15 @@
   check_mode: no
   register: aws_installed_version
 
-# aws --version prints to stdout; fold in stderr to stay robust. regex_search
-# with a capture group yields a list, so first/default extracts the version
-# string (or '' when aws is absent).
+# stderr is folded in because not every aws-cli version prints --version to stdout.
 - name: Determine the installed aws-cli version
   set_fact:
     aws_installed_cli_version: >-
       {{ ((aws_installed_version.stdout | default('')) ~ (aws_installed_version.stderr | default('')))
       | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}
 
-# Reinstall whenever the running version differs from the pin, so a bump to
-# aws_cli_version actually upgrades an already-provisioned host, not just fresh ones.
+# Gated on the version rather than mere presence, so a pin bump upgrades hosts the
+# role has already provisioned.
 - name: Install aws-cli
   when: aws_installed_cli_version != aws_cli_version
   block:
@@ -66,17 +63,10 @@
       changed_when: false
       register: aws_cli_keyring
 
-    # Catches a botched key rotation before we trust the imported key to verify
-    # the download — re-confirm aws_cli_key_fingerprint against AWS's published value.
-    # The pub-count check is what makes the fingerprint match meaningful: gpg lists
-    # every key in the keyring, so a second key appended to the vendored .asc would
-    # otherwise sit alongside the expected one and still be trusted to sign the download.
-    # The fingerprint is compared against the fpr: record — the value gpg computes from
-    # the key material — not against the whole dump, which also carries uid text copied
-    # verbatim from the .asc: a key naming the expected fingerprint in its uid would
-    # satisfy a bare substring match while hashing to something else entirely.
-    # The validity check turns the documented "re-vendor on expiry" step into
-    # something enforced — gpg --verify alone still exits 0 under an expired key.
+    # Three ways a bad re-vendor would otherwise slip past: a second key in the .asc
+    # is trusted alongside the expected one; uid text is copied verbatim from the file,
+    # so only the computed fpr: record proves identity; and gpg --verify exits 0 under
+    # an expired key.
     - name: Assert the keyring holds only the expected, still-valid key
       assert:
         that:
@@ -97,7 +87,6 @@
         url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip.sig"
         dest: "{{ tmp_dir.path }}/awscliv2.zip.sig"
 
-    # Fails the play on a bad/missing signature (gpg exits non-zero).
     - name: Verify aws-cli signature against the vendored key
       command:
         cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --verify {{ tmp_dir.path }}/awscliv2.zip.sig {{ tmp_dir.path }}/awscliv2.zip"
@@ -109,9 +98,8 @@
         dest: "{{ tmp_dir.path }}"
         remote_src: true
 
-    # --update lets the installer overwrite an existing install; it is also a
-    # no-op-safe flag on a fresh box. The version gate above is what guards
-    # idempotence, so no creates: here.
+    # Without --update the installer refuses to run over an existing install.
+    # Idempotence comes from the version gate above, hence no creates:.
     - name: Run aws-cli installer
       become: true
       command:
