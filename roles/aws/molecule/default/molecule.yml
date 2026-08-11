@@ -1,0 +1,8 @@
+---
+platforms:
+  - name: aws
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    # pin: role requires x86_64
+    platform: linux/amd64
+    privileged: true
+    pre_build_image: true
