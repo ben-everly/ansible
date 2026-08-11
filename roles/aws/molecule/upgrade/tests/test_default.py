@@ -28,7 +28,7 @@ def test_upgrade_replaced_the_seeded_install(host):
 
 def test_aws_upgraded_to_pinned_version(host):
     # prepare.yml seeded AWS_CLI_OLD_VERSION; converge should have upgraded it.
-    cmd = host.run("aws --version")
+    cmd = host.run("/usr/local/bin/aws --version")
     assert cmd.rc == 0, f"aws --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
     combined = cmd.stdout + cmd.stderr
     assert f"aws-cli/{AWS_CLI_VERSION}" in combined, f"expected pinned version, got: {combined!r}"
