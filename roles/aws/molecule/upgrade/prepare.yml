@@ -10,6 +10,11 @@
 #
 # tests/test_default.py reads aws_cli_version out of this file, so the seeded
 # version lives in exactly one place.
+#
+# Because seeding runs the role, this pinned seed's .zip.sig must verify against
+# whichever key files/aws-cli.asc currently holds. When that key is re-vendored
+# (expiry or AWS rotation), re-check that 2.30.0's signature still verifies under
+# the new key; if not, bump the seed to a version it does verify.
 - name: Prepare
   hosts: all
   vars:
