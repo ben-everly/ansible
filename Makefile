@@ -1,14 +1,16 @@
 MOLECULE_ROLES := $(sort $(patsubst roles/%/molecule/default/molecule.yml,%,$(wildcard roles/*/molecule/default/molecule.yml)))
 
-# Roles are discovered by their default scenario, but --all runs every scenario
-# a role defines, so extra scenarios (e.g. aws/upgrade) are not silently skipped.
+# --all by default so extra scenarios (e.g. aws/upgrade) are never silently
+# skipped; narrowed to one scenario only when the caller names it on the
+# command line (SCENARIO ?= default can't tell "passed default" from "unset").
 SCENARIO ?= default
+MOLECULE_TEST_SCOPE := $(if $(filter command line,$(origin SCENARIO)),-s $(SCENARIO),--all)
 
 .PHONY: test converge verify destroy
 
 test:
 ifdef ROLE
-	cd roles/$(ROLE) && molecule test --all
+	cd roles/$(ROLE) && molecule test $(MOLECULE_TEST_SCOPE)
 else
 	@passed=""; failed=""; \
 	for role in $(MOLECULE_ROLES); do \
