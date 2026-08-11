@@ -98,6 +98,20 @@
         dest: "{{ tmp_dir.path }}"
         remote_src: true
 
+    # The installer exits 0 without touching a symlink when /usr/local/aws-cli/v2/<ver>
+    # already exists, and it traps no signals — so an interrupted first install leaves
+    # that tree behind with no aws on PATH, and every later run then no-ops and fails
+    # the confirmation below, forever. Reaching here means the probe did not report the
+    # pin, so the tree is stale or partial either way. Removing it before verifying the
+    # download would risk a working install for nothing, hence the placement. If the
+    # install then fails, aws is briefly absent — better than a permanent no-op, since
+    # the next run reinstalls cleanly.
+    - name: Remove any pre-existing tree for the pinned version
+      become: true
+      file:
+        path: "/usr/local/aws-cli/v2/{{ aws_cli_version }}"
+        state: absent
+
     # Without --update the installer refuses to run over an existing install.
     # Idempotence comes from the version gate above, hence no creates:.
     - name: Run aws-cli installer
@@ -105,15 +119,26 @@
       command:
         cmd: "{{ tmp_dir.path }}/aws/install --update"
 
-    # The installer exits 0 without repointing its symlinks when its target version
-    # directory already exists, so a run that "succeeded" can leave aws absent or on
-    # the wrong version.
-    - name: Confirm the installer produced the pinned version
+    # No failed_when: a missing or broken binary should fail here on the return code,
+    # with the shell's own error rather than a version mismatch.
+    - name: Read back the installed aws-cli version
       command:
         cmd: /usr/local/bin/aws --version
       changed_when: false
-      failed_when: "'aws-cli/' + aws_cli_version not in (aws_post_install.stdout | default('')) + (aws_post_install.stderr | default(''))"
       register: aws_post_install
+
+    # Parsed like the pre-install probe, and compared exactly: a substring test lets
+    # an installed 2.35.41 satisfy a pin of 2.35.4.
+    - name: Confirm the installer produced the pinned version
+      vars:
+        aws_reported_cli_version: >-
+          {{ ((aws_post_install.stdout | default('')) ~ (aws_post_install.stderr | default('')))
+          | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}
+      assert:
+        that: aws_reported_cli_version == aws_cli_version
+        fail_msg: >-
+          aws-cli reports version '{{ aws_reported_cli_version }}' after install,
+          expected '{{ aws_cli_version }}'
   always:
     - name: Remove tmp dir
       file:
