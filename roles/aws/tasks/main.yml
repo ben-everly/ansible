@@ -140,6 +140,7 @@
           expected '{{ aws_cli_version }}'
   always:
     - name: Remove tmp dir
+      become: true
       file:
         path: "{{ tmp_dir.path }}"
         state: absent

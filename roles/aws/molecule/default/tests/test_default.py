@@ -24,3 +24,8 @@ def test_aws_version(host):
     assert cmd.rc == 0, f"aws --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
     combined = cmd.stdout + cmd.stderr
     assert f"aws-cli/{AWS_CLI_VERSION}" in combined, f"unexpected aws version output: {combined!r}"
+
+
+def test_no_staging_dir_left_behind(host):
+    cmd = host.run("find /tmp -maxdepth 1 -name 'ansible.*'")
+    assert not cmd.stdout.strip(), f"staging dir survived cleanup: {cmd.stdout!r}"
