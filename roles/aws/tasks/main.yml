@@ -62,19 +62,18 @@
       changed_when: false
       register: aws_cli_keyring
 
-    # Three ways a bad re-vendor would otherwise slip past: a second key in the .asc
-    # is trusted alongside the expected one; uid text is copied verbatim from the file,
-    # so only the computed fpr: record proves identity; and gpg --verify exits 0 under
-    # an expired key.
-    - name: Assert the keyring holds only the expected, still-valid key
+    # Three ways a bad re-vendor would otherwise slip past: an extra key or signing
+    # subkey in the .asc is trusted alongside the expected one; uid text is copied
+    # verbatim from the file, so only the computed fpr: records prove identity; and
+    # gpg --verify exits 0 under an expired key or subkey.
+    - name: Assert the keyring holds only the expected, still-valid keys
       assert:
         that:
-          - aws_cli_keyring.stdout | regex_findall('^pub:', multiline=True) | length == 1
-          - aws_cli_keyring.stdout | regex_findall('^fpr:::::::::([0-9A-F]+):', multiline=True) | first == aws_cli_key_fingerprint
-          - aws_cli_keyring.stdout | regex_findall('^pub:([^:]*):', multiline=True) | first not in ['e', 'r']
+          - aws_cli_keyring.stdout | regex_findall('^fpr:::::::::([0-9A-F]+):', multiline=True) | sort == aws_cli_key_fingerprints | sort
+          - aws_cli_keyring.stdout | regex_findall('^(?:pub|sub):([^:]*):', multiline=True) | select('in', ['e', 'r']) | list | length == 0
         fail_msg: >-
-          vendored aws-cli signing key must be exactly one valid key with fingerprint
-          {{ aws_cli_key_fingerprint }} — re-vendor it from AWS's published key
+          vendored aws-cli keyring must hold exactly the valid keys
+          {{ aws_cli_key_fingerprints | join(', ') }} — re-vendor from AWS's published key
 
     - name: Download aws-cli v2 zip
       get_url:
