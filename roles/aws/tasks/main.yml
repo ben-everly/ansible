@@ -14,12 +14,11 @@
   check_mode: no
   register: aws_installed_version
 
-# stderr is folded in because not every aws-cli version prints --version to stdout.
 - name: Determine the installed aws-cli version
-  set_fact:
-    aws_installed_cli_version: >-
-      {{ ((aws_installed_version.stdout | default('')) ~ (aws_installed_version.stderr | default('')))
-      | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}
+  include_tasks: parse-cli-version.yml
+  vars:
+    aws_version_probe: "{{ aws_installed_version }}"
+    aws_version_fact: aws_installed_cli_version
 
 # Gated on the version rather than mere presence, so a pin bump upgrades hosts the
 # role has already provisioned.
@@ -127,13 +126,14 @@
       changed_when: false
       register: aws_post_install
 
-    # Parsed like the pre-install probe, and compared exactly: a substring test lets
-    # an installed 2.35.41 satisfy a pin of 2.35.4.
-    - name: Confirm the installer produced the pinned version
+    - name: Determine the version the installer produced
+      include_tasks: parse-cli-version.yml
       vars:
-        aws_reported_cli_version: >-
-          {{ ((aws_post_install.stdout | default('')) ~ (aws_post_install.stderr | default('')))
-          | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}
+        aws_version_probe: "{{ aws_post_install }}"
+        aws_version_fact: aws_reported_cli_version
+
+    # Compared exactly: a substring test lets an installed 2.35.41 satisfy a pin of 2.35.4.
+    - name: Confirm the installer produced the pinned version
       assert:
         that: aws_reported_cli_version == aws_cli_version
         fail_msg: >-
