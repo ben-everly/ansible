@@ -1,6 +1,6 @@
 ---
 # renovate: datasource=github-tags depName=aws/aws-cli
-aws_cli_version: "2.35.4"
+aws_cli_version: "2.36.34"
 # Signing key for the install-time .sig check: files/aws-cli.asc
 # Vendored 2026-08-08; expires 2027-07-01. On expiry, re-export AWS's refreshed
 # key and re-confirm its fingerprint against the published value at
