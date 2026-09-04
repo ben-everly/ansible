@@ -1,35 +1,147 @@
-- name: Find latest release of ecsy
-  uri:
-    url: https://api.github.com/repos/oberd/ecsy/releases/latest
-  register: download
+---
+- name: Assert aws-cli supports this architecture
+  assert:
+    that: ansible_architecture == "x86_64"
+    fail_msg: "aws role only supports x86_64 (got {{ ansible_architecture }})"
 
-- name: Set asset
-  set_fact:
-    asset: "{{ download.json.assets | select('match', '.*linux') | first }}"
+# Bare `aws` on PATH can resolve to an asdf shim or a legacy /snap/bin/aws, neither
+# of which this role manages.
+- name: Check installed aws-cli version
+  command:
+    cmd: /usr/local/bin/aws --version
+  changed_when: false
+  failed_when: false
+  check_mode: no
+  register: aws_installed_version
 
-# get_url requires directory to exist
-- name: Ensure install directory exists
-  file:
-    state: directory
-    path: $HOME/.local/bin
+- name: Determine the installed aws-cli version
+  include_tasks: parse-cli-version.yml
+  vars:
+    aws_version_probe: "{{ aws_installed_version }}"
+    aws_version_fact: aws_installed_cli_version
 
-- name: Download latest version of ecsy
-  get_url:
-    url: "{{ asset.browser_download_url }}"
-    dest: $HOME/.local/bin/ecsy
-    mode: "755"
-    force: true
-
-- name: Install snapd
-  become: true
-  apt:
-    name: snapd
-    state: latest
-    update_cache: true
-
+# Gated on the version rather than mere presence, so a pin bump upgrades hosts the
+# role has already provisioned.
 - name: Install aws-cli
-  become: true
-  snap:
-    name: aws-cli
-    classic: true
-    state: present
+  when: aws_installed_cli_version != aws_cli_version
+  block:
+    - name: Install apt packages
+      become: true
+      apt:
+        name:
+          - unzip
+          - gnupg
+        state: present
+        update_cache: true
+
+    - name: Make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: Create a throwaway gpg keyring
+      file:
+        path: "{{ tmp_dir.path }}/gnupg"
+        state: directory
+        mode: "0700"
+
+    - name: Stage the AWS CLI signing key
+      copy:
+        src: aws-cli.asc
+        dest: "{{ tmp_dir.path }}/aws-cli.asc"
+        mode: "0644"
+
+    - name: Import the AWS CLI signing key
+      command:
+        cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --import {{ tmp_dir.path }}/aws-cli.asc"
+      changed_when: false
+
+    - name: Read fingerprints from the throwaway keyring
+      command:
+        cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --with-colons --fingerprint"
+      changed_when: false
+      register: aws_cli_keyring
+
+    # Three ways a bad re-vendor would otherwise slip past: an extra key or signing
+    # subkey in the .asc is trusted alongside the expected one; uid text is copied
+    # verbatim from the file, so only the computed fpr: records prove identity; and
+    # gpg --verify exits 0 under an expired key or subkey.
+    - name: Assert the keyring holds only the expected, still-valid keys
+      assert:
+        that:
+          - aws_cli_keyring.stdout | regex_findall('^fpr:::::::::([0-9A-F]+):', multiline=True) | sort == aws_cli_key_fingerprints | sort
+          - aws_cli_keyring.stdout | regex_findall('^(?:pub|sub):([^:]*):', multiline=True) | select('in', ['e', 'r']) | list | length == 0
+        fail_msg: >-
+          vendored aws-cli keyring must hold exactly the valid keys
+          {{ aws_cli_key_fingerprints | join(', ') }} — re-vendor from AWS's published key
+
+    - name: Download aws-cli v2 zip
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip"
+        dest: "{{ tmp_dir.path }}/awscliv2.zip"
+
+    - name: Download aws-cli v2 signature
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli_version }}.zip.sig"
+        dest: "{{ tmp_dir.path }}/awscliv2.zip.sig"
+
+    - name: Verify aws-cli signature against the vendored key
+      command:
+        cmd: "gpg --homedir {{ tmp_dir.path }}/gnupg --batch --verify {{ tmp_dir.path }}/awscliv2.zip.sig {{ tmp_dir.path }}/awscliv2.zip"
+      changed_when: false
+
+    - name: Extract aws-cli
+      unarchive:
+        src: "{{ tmp_dir.path }}/awscliv2.zip"
+        dest: "{{ tmp_dir.path }}"
+        remote_src: true
+
+    # The installer exits 0 without touching a symlink when /usr/local/aws-cli/v2/<ver>
+    # already exists, and it traps no signals — so an interrupted first install leaves
+    # that tree behind with no aws on PATH, and every later run then no-ops and fails
+    # the confirmation below, forever. Reaching here means the probe did not report the
+    # pin, so the tree is stale or partial either way. Removing it before verifying the
+    # download would risk a working install for nothing, hence the placement. If the
+    # install then fails, aws is briefly absent — better than a permanent no-op, since
+    # the next run reinstalls cleanly.
+    - name: Remove any pre-existing tree for the pinned version
+      become: true
+      file:
+        path: "/usr/local/aws-cli/v2/{{ aws_cli_version }}"
+        state: absent
+
+    # Without --update the installer refuses to run over an existing install.
+    # Idempotence comes from the version gate above, hence no creates:.
+    - name: Run aws-cli installer
+      become: true
+      command:
+        cmd: "{{ tmp_dir.path }}/aws/install --update"
+
+    # No failed_when: a missing or broken binary should fail here on the return code,
+    # with the shell's own error rather than a version mismatch.
+    - name: Read back the installed aws-cli version
+      command:
+        cmd: /usr/local/bin/aws --version
+      changed_when: false
+      register: aws_post_install
+
+    - name: Determine the version the installer produced
+      include_tasks: parse-cli-version.yml
+      vars:
+        aws_version_probe: "{{ aws_post_install }}"
+        aws_version_fact: aws_reported_cli_version
+
+    # Compared exactly: a substring test lets an installed 2.35.41 satisfy a pin of 2.35.4.
+    - name: Confirm the installer produced the pinned version
+      assert:
+        that: aws_reported_cli_version == aws_cli_version
+        fail_msg: >-
+          aws-cli reports version '{{ aws_reported_cli_version }}' after install,
+          expected '{{ aws_cli_version }}'
+  always:
+    - name: Remove tmp dir
+      become: true
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
+      when: tmp_dir.path is defined

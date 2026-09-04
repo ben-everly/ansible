@@ -1,0 +1,9 @@
+---
+# stderr is folded in because not every aws-cli version prints --version to stdout.
+# Callers name their own output fact: a block's when: is re-evaluated per task, so a
+# shared name would let the post-install parse rewrite the gate variable mid-block.
+- name: Parse the aws-cli version reported by the probe
+  set_fact:
+    "{{ aws_version_fact }}": >-
+      {{ ((aws_version_probe.stdout | default('')) ~ (aws_version_probe.stderr | default('')))
+      | regex_search('aws-cli/([0-9.]+)', '\1') | default([''], true) | first }}

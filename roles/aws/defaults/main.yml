@@ -1,0 +1,11 @@
+---
+# renovate: datasource=github-tags depName=aws/aws-cli
+aws_cli_version: "2.35.4"
+# Signing key for the install-time .sig check: files/aws-cli.asc
+# Vendored 2026-08-08; expires 2027-07-01. On expiry, re-export AWS's refreshed
+# key and re-confirm its fingerprint against the published value at
+# https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+# List every key object the .asc carries, subkeys included: the install-time assert
+# compares this against the whole keyring, so a botched re-vendor fails loudly.
+aws_cli_key_fingerprints:
+  - "FB5DB77FD5C118B80511ADA8A6310ACC4672475C"

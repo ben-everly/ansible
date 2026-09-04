@@ -1,0 +1,23 @@
+---
+# Seed an older aws-cli so converge must UPGRADE it to the pinned version.
+# This exercises the version gate's upgrade path (installed != pin), which the
+# default scenario's fresh install does not cover.
+#
+# Seeding runs the role itself with the pin overridden, rather than a hand-rolled
+# download/install: one definition of how aws-cli gets installed, and the fixture
+# goes through the same signature verification the role insists on. Overriding
+# aws_cli_version as a play var beats the role default.
+#
+# tests/test_default.py reads aws_cli_version out of this file, so the seeded
+# version lives in exactly one place.
+#
+# Because seeding runs the role, this pinned seed's .zip.sig must verify against
+# whichever key files/aws-cli.asc currently holds. When that key is re-vendored
+# (expiry or AWS rotation), re-check that 2.30.0's signature still verifies under
+# the new key; if not, bump the seed to a version it does verify.
+- name: Prepare
+  hosts: all
+  vars:
+    aws_cli_version: "2.30.0" # older than the pin, so converge must upgrade
+  roles:
+    - role: "{{ playbook_dir }}/../.."
