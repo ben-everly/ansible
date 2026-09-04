@@ -51,7 +51,8 @@ Run tests for a specific role:
 make test ROLE=github-cli
 ```
 
-Both run every scenario a role defines, not just `default`.
+Both run every scenario a role defines, not just `default`. Pass `SCENARIO` to
+narrow the single-role form to one.
 
 Run individual stages (useful during development):
 

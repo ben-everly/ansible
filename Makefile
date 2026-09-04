@@ -1,10 +1,11 @@
 MOLECULE_ROLES := $(sort $(patsubst roles/%/molecule/default/molecule.yml,%,$(wildcard roles/*/molecule/default/molecule.yml)))
 
-# --all by default so extra scenarios (e.g. aws/upgrade) are never silently
-# skipped; narrowed to one scenario only when the caller names it on the
-# command line (SCENARIO ?= default can't tell "passed default" from "unset").
-SCENARIO ?= default
-MOLECULE_TEST_SCOPE := $(if $(filter command line,$(origin SCENARIO)),-s $(SCENARIO),--all)
+# Empty by default so an unset SCENARIO is distinguishable from an explicit
+# "default": test runs every scenario unless narrowed, so extra ones (e.g.
+# aws/upgrade) are never silently skipped, and the rest act on one scenario.
+SCENARIO ?=
+MOLECULE_TEST_SCOPE := $(if $(SCENARIO),-s $(SCENARIO),--all)
+MOLECULE_SCENARIO := -s $(if $(SCENARIO),$(SCENARIO),default)
 
 .PHONY: test converge verify destroy
 
@@ -39,16 +40,16 @@ converge:
 ifndef ROLE
 	$(error ROLE is required for converge, e.g. make converge ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule converge -s $(SCENARIO)
+	cd roles/$(ROLE) && molecule converge $(MOLECULE_SCENARIO)
 
 verify:
 ifndef ROLE
 	$(error ROLE is required for verify, e.g. make verify ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule verify -s $(SCENARIO)
+	cd roles/$(ROLE) && molecule verify $(MOLECULE_SCENARIO)
 
 destroy:
 ifndef ROLE
 	$(error ROLE is required for destroy, e.g. make destroy ROLE=github-cli)
 endif
-	cd roles/$(ROLE) && molecule destroy -s $(SCENARIO)
+	cd roles/$(ROLE) && molecule destroy $(MOLECULE_SCENARIO)
