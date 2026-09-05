@@ -1,12 +1,12 @@
 ---
 # renovate: datasource=github-releases depName=ryanoasis/nerd-fonts
-nerd_fonts_version: "v3.4.0"
+nerd_fonts_version: "v3.5.1"
 
 # sha256 of each <font>.tar.xz from the release's SHA-256.txt
 nerd_fonts_sha256:
-  FiraCode: "d83fb093e0e05a531cd6f19886a6ceb884a4fa5ea3b53cf099fc1f30c5b3e47d"
-  Iosevka: "213ee24cda99ca84d0a8326de133e7e8b2baf9ba23659ce829f589f771d357d2"
-  IosevkaTerm: "cad9da572d25e3413f7a15a319d2f3c9e7e915ee016baa99e0d88fc08cf5b781"
-  JetBrainsMono: "ef552a3e638f25125c6ad4c51176a6adcdce295ab1d2ffacf0db060caf8c1582"
-  SourceCodePro: "d52d97b66c4c5d6d9d99c88df55148faf39738f244485026f22f8e47407744f4"
-  UbuntuMono: "a13cf890ef10517c59e812ced167245f2db47d37d2b03c9fb43ddef023a3e776"
+  FiraCode: "68e3bd6164864b8b514605bc34e3a87ac401c8c48682fcce6478c70263340207"
+  Iosevka: "3b94ea1dc3955756762f977b7677bca671947dd56bc755a6f8465a8e83b5f257"
+  IosevkaTerm: "054a4a369cdcc5d57e9bc91ea56dfefd66c71c253dcb0c0d7b72c0810373da26"
+  JetBrainsMono: "04d5e8f903693f9dd13e16f867e994834e681eb3c72c0d337a770dcda09010cf"
+  SourceCodePro: "50ead7bb7addce27cf4b55f4fffb669b5f1899fece675fad623a2a75a478c8c7"
+  UbuntuMono: "9c4d18e23e1ff809849fa0afec79ade67c58e22150c95ea373d22598c1ddea18"
