@@ -1,0 +1,24 @@
+---
+# renovate: datasource=github-releases depName=sxyazi/yazi
+yazi_version: "v26.9.1"
+
+# Upstream publishes no checksum or signature asset and renovate cannot derive
+# this: re-compute it on every version bump.
+yazi_deb_sha256: "331d6247c0a0fd549f14cd599a928a529b8b22eded1bb1f61a518376c7621b45"
+
+# Yazi's deb Recommends, satisfied by hand: the field holds alternatives
+# (fd-find|fd, xsel|xclip|wl-clipboard) that install_recommends cannot parse.
+# fd-find is the one Recommends missing here: the tasks install it directly,
+# because a task depends on it and this list is the operator's to trim.
+yazi_recommended_packages:
+  - bash-completion
+  - ffmpeg
+  - 7zip
+  - jq
+  - poppler-utils
+  - ripgrep
+  - fzf
+  - zoxide
+  - imagemagick
+  - xclip
+  - wl-clipboard

@@ -1,0 +1,10 @@
+---
+# Seeds an older yazi through the role itself, so converge has to take the version
+# gate's upgrade path. tests/test_default.py reads this version back.
+- name: Prepare
+  hosts: all
+  vars:
+    yazi_version: "v26.8.15"
+    yazi_deb_sha256: "80e6434bf12ef5c17cf715ae0f17df15cc40459a5caf1dd12f8b377ae7e9361a"
+  roles:
+    - role: "{{ playbook_dir }}/../.."
