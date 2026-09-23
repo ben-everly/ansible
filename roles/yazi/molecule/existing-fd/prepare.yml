@@ -1,0 +1,16 @@
+---
+# Plants a regular file where the role wants to put its fd symlink. A hand-installed
+# fd (cargo, or an upstream build) is the common way for that name to be taken, and
+# the role must neither fail on it nor clobber it. tests/test_default.py reads the
+# sentinel back to prove the file survived untouched.
+- name: Prepare
+  hosts: all
+  tasks:
+    - name: Plant a hand-installed fd
+      become: true
+      copy:
+        dest: /usr/local/bin/fd
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          echo hand-installed fd

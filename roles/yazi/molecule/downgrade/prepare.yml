@@ -1,0 +1,7 @@
+---
+# Seeds the current pin through the role itself, so converge has to downgrade from
+# it: the version gate fires on any inequality, not just "older than".
+- name: Prepare
+  hosts: all
+  roles:
+    - role: "{{ playbook_dir }}/../.."

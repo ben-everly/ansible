@@ -1,0 +1,109 @@
+---
+- name: Assert yazi supports this architecture
+  assert:
+    that: ansible_architecture == "x86_64"
+    fail_msg: "yazi role only supports x86_64 (got {{ ansible_architecture }})"
+
+# Outside the version gate: enforced on every run, not just install and upgrade runs.
+- name: Install yazi's recommended integrations
+  become: true
+  apt:
+    name: "{{ yazi_recommended_packages }}"
+    state: present
+    update_cache: true
+
+# Kept out of yazi_recommended_packages: `s` is a stock keybinding, so fd is not
+# an integration the operator can drop without leaving the default keymap broken.
+# No update_cache: the task above already refreshed it this run.
+- name: Install fd for yazi's search
+  become: true
+  apt:
+    name: fd-find
+    state: present
+
+- name: Check whether anything already answers to fd
+  stat:
+    path: /usr/local/bin/fd
+  register: yazi_fd
+
+# Debian ships fd-find as fdfind, but yazi spawns `fd` directly for its
+# `search --via=fd` keybinding, so a shell alias does not reach it.
+# Skipped when a regular file holds the name: that is almost always a real fd
+# (cargo, or an upstream build), which needs no help from us. A symlink is
+# rewritten instead of skipped, which costs nothing and repairs a stale target.
+- name: Link fd to fdfind for yazi's search
+  become: true
+  when: not yazi_fd.stat.exists or yazi_fd.stat.islnk
+  file:
+    src: /usr/bin/fdfind
+    dest: /usr/local/bin/fd
+    state: link
+
+# Bare `yazi`, not an absolute path: an unmanaged install answering on PATH at the
+# pin means this role has nothing to do.
+- name: Check installed yazi version
+  command:
+    cmd: yazi --version
+  changed_when: false
+  failed_when: false
+  check_mode: no
+  register: yazi_installed
+
+- name: Determine the installed and pinned yazi versions
+  set_fact:
+    yazi_installed_version: >-
+      {{ yazi_installed.stdout | regex_search('Version:\s+(\S+)', '\1') | default([''], true) | first }}
+    yazi_pinned_version: "{{ yazi_version | regex_replace('^v', '') }}"
+
+- name: Install yazi
+  when: yazi_installed_version != yazi_pinned_version
+  block:
+    - name: Make temp dir
+      tempfile:
+        state: directory
+      register: tmp_dir
+
+    - name: Download yazi deb
+      get_url:
+        url: "https://github.com/sxyazi/yazi/releases/download/{{ yazi_version }}/yazi-x86_64-unknown-linux-gnu.deb"
+        dest: "{{ tmp_dir.path }}/yazi.deb"
+        checksum: "sha256:{{ yazi_deb_sha256 }}"
+
+    # update_cache: resolving the deb's dependencies reads the package lists, and
+    # a host without them fails on an unsatisfiable dep.
+    # allow_downgrade: the gate fires on any inequality, so a reverted pin asks for
+    # an older deb, which the module otherwise refuses.
+    - name: Install yazi
+      become: true
+      apt:
+        deb: "{{ tmp_dir.path }}/yazi.deb"
+        update_cache: true
+        allow_downgrade: true
+
+    # Absolute path, unlike the gate above: this asks what the deb just produced,
+    # not what PATH answers with, so a shadowing install must not be consulted.
+    - name: Read back the installed yazi version
+      command:
+        cmd: /usr/bin/yazi --version
+      changed_when: false
+      register: yazi_post_install
+
+    # Parsed here rather than inline in the assert: the conditional parser mangles
+    # the '\1' backreference and the filter fails.
+    - name: Determine the version the deb produced
+      set_fact:
+        yazi_reported_version: >-
+          {{ yazi_post_install.stdout | regex_search('Version:\s+(\S+)', '\1') | default([''], true) | first }}
+
+    - name: Confirm the deb installed the pinned version
+      assert:
+        that: yazi_reported_version == yazi_pinned_version
+        fail_msg: >-
+          yazi reports version '{{ yazi_reported_version }}' after install,
+          expected '{{ yazi_pinned_version }}'
+  always:
+    - name: Remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
+      when: tmp_dir.path is defined

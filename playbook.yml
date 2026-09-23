@@ -106,6 +106,7 @@
     - role: handy
     - role: acli
     - role: cloudflared
+    - role: yazi
   tasks:
     - name: apt update
       become: true
