@@ -29,6 +29,6 @@
 - name: Install apt packages
   become: true
   apt:
-    name: wezterm
+    name: wezterm-nightly
     state: latest
     update_cache: true

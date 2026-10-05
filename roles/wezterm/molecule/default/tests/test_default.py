@@ -1,5 +1,6 @@
 def test_wezterm_package_installed(host):
-    assert host.package("wezterm").is_installed
+    assert host.package("wezterm-nightly").is_installed
+    assert not host.package("wezterm").is_installed
 
 
 def test_wezterm_binary(host):
