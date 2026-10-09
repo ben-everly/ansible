@@ -1,8 +1,6 @@
 import pytest
 
 PROVIDERS = {
-    "pip": "pip show pynvim",
-    "gem": "gem list -i neovim",
     "npm": "npm ls -g neovim",
     "cpanm": "perl -MNeovim::Ext -e 1",
 }
@@ -10,6 +8,17 @@ PROVIDERS = {
 
 def test_universal_ctags_installed(host):
     assert host.package("universal-ctags").is_installed
+
+
+def test_python_provider(host):
+    home = host.user().home
+    cmd = host.run(f"{home}/.local/bin/pynvim-python -c 'import pynvim'")
+    assert cmd.rc == 0, f"pynvim not importable: {cmd.stderr!r}"
+
+
+def test_ruby_provider(host):
+    cmd = host.run("/usr/local/bin/neovim-ruby-host --version")
+    assert cmd.rc == 0, f"neovim-ruby-host failed: {cmd.stderr!r}"
 
 
 def test_nvim_binary(host):

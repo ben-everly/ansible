@@ -4,6 +4,9 @@
     name:
       - universal-ctags
       - libfuse2
+      - python3-venv
+      - ruby-dev
+      - build-essential
     state: latest
     update_cache: true
 
@@ -12,41 +15,51 @@
     url: https://api.github.com/repos/neovim/neovim/releases/latest
   register: neovim
 
-# upstream publishes no checksums or signatures for release assets
-# (checked v0.12.x), so HTTPS is the only integrity guarantee available
+# upstream publishes no checksums or signatures (as of v0.12)
 - name: Download nvim appimage
   get_url:
     url: "{{ neovim.json.assets | selectattr('name', 'equalto', 'nvim-linux-x86_64.appimage') | map(attribute='browser_download_url') | first }}"
     dest: $HOME/.local/bin/nvim
     mode: "755"
 
-- name: Check which provider runtimes are on PATH
-  shell: "command -v {{ item }}"
-  loop: "{{ neovim_provider_runtimes }}"
-  register: provider_checks
+- name: Check python provider venv
+  command: "{{ ansible_env.HOME }}/.local/share/nvim/venv/bin/python -c 'import pynvim'"
+  register: pynvim_venv
   changed_when: false
   failed_when: false
 
-- name: Resolve which provider runtimes are available
-  set_fact:
-    providers_present: "{{ provider_checks.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
+# a system python upgrade leaves the venv pointing at the old site-packages
+- name: Remove broken python provider venv
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/nvim/venv"
+    state: absent
+  when: pynvim_venv.rc != 0
 
-- name: Install pip packages
-  when: "'pip' in providers_present"
+- name: Install python provider
   pip:
     name: pynvim
     state: latest
-    executable: pip
+    virtualenv: "{{ ansible_env.HOME }}/.local/share/nvim/venv"
+    virtualenv_command: /usr/bin/python3 -m venv
 
-- name: Install ruby packages
-  when: "'gem' in providers_present"
+- name: Link python provider onto PATH
+  file:
+    src: "{{ ansible_env.HOME }}/.local/share/nvim/venv/bin/pynvim-python"
+    dest: "{{ ansible_env.HOME }}/.local/bin/pynvim-python"
+    state: link
+
+- name: Install ruby provider
+  become: true
+  # /usr/bin/gem is `#!/usr/bin/env ruby`, so keep asdf's ruby off PATH
+  environment:
+    PATH: "/usr/bin:/bin"
   gem:
     name: neovim
     state: latest
-    executable: gem
+    user_install: false
+    executable: /usr/bin/gem
 
 - name: Install node neovim packages
-  when: "'npm' in providers_present"
   npm:
     name: "{{ item }}"
     global: true
@@ -58,33 +71,9 @@
     - tree-sitter-cli
 
 - name: Install cpan packages
-  when: "'cpanm' in providers_present"
   cpanm:
     name: "{{ item }}"
     notest: true
     executable: cpanm
   with_items:
     - Neovim::Ext
-
-- name: Verify provider packages installed
-  shell: "{{ neovim_provider_verify[item] }}"
-  loop: "{{ providers_present }}"
-  register: provider_verifications
-  changed_when: false
-  failed_when: false
-
-- name: Surface provider runtimes that did not install
-  vars:
-    verified_providers: "{{ provider_verifications.results | selectattr('rc', 'eq', 0) | map(attribute='item') | list }}"
-    failed_providers: "{{ neovim_provider_runtimes | difference(verified_providers) }}"
-    failed_required: "{{ failed_providers | intersect(neovim_required_providers) }}"
-  block:
-    - name: Warn about provider runtimes that did not install
-      debug:
-        msg: "neovim provider runtimes unavailable or failed to install: {{ failed_providers | join(', ') }}"
-      when: failed_providers | length > 0
-
-    - name: Fail when a required provider did not install
-      fail:
-        msg: "required neovim providers missing or failed to install: {{ failed_required | join(', ') }}"
-      when: failed_required | length > 0
