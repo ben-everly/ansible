@@ -37,6 +37,7 @@
       become: true
       apt:
         deb: "{{ tmp_dir.path }}/bottom.deb"
+        allow_downgrade: true
   always:
     - name: Remove tmp dir
       file:
