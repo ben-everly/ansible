@@ -23,6 +23,7 @@
       get_url:
         url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom_{{ bottom_version }}_amd64.deb"
         dest: "{{ tmp_dir.path }}/bottom.deb"
+        checksum: "sha256:{{ bottom_deb_sha256 }}"
 
     - name: Install bottom
       become: true
