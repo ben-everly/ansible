@@ -1,4 +1,5 @@
 ---
+# renovate: datasource=github-releases depName=ClementTsang/bottom
 bottom_version: "0.14.9"
 
 # Upstream publishes no checksum: recompute on every version bump.
