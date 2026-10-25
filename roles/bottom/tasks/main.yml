@@ -1,3 +1,9 @@
+---
+- name: Assert bottom supports this architecture
+  assert:
+    that: ansible_architecture == "x86_64"
+    fail_msg: "bottom role only supports x86_64 (got {{ ansible_architecture }})"
+
 - name: Check if bottom is installed
   shell:
     cmd: which btm

@@ -2,5 +2,6 @@
 platforms:
   - name: bottom
     image: geerlingguy/docker-ubuntu2404-ansible:latest
+    platform: linux/amd64
     privileged: true
     pre_build_image: true
