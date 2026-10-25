@@ -23,3 +23,7 @@ def test_btm_version(host):
     assert cmd.rc == 0, f"btm --version failed: stdout={cmd.stdout!r} stderr={cmd.stderr!r}"
     assert cmd.stdout.split() == ["bottom", BOTTOM_VERSION], f"unexpected btm version output: {cmd.stdout!r}"
 
+
+def test_no_staging_dir_left_behind(host):
+    cmd = host.run("find /tmp -maxdepth 1 -name 'ansible.*'")
+    assert not cmd.stdout.strip(), f"staging dir survived cleanup: {cmd.stdout!r}"
