@@ -19,11 +19,12 @@
         state: directory
       register: tmp_dir
 
-    - name: Download bottom
+    - name: Download bottom deb
       get_url:
-        url: https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
+        url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom_{{ bottom_version }}_amd64.deb"
         dest: "{{ tmp_dir.path }}/bottom.deb"
 
     - name: Install bottom
       become: true
-      apt: 'deb="{{ tmp_dir.path }}/bottom.deb"'
+      apt:
+        deb: "{{ tmp_dir.path }}/bottom.deb"
