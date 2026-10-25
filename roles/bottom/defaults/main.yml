@@ -1,5 +1,5 @@
 ---
-bottom_version: "0.6.8"
+bottom_version: "0.14.9"
 
 # Upstream publishes no checksum: recompute on every version bump.
-bottom_deb_sha256: "44f876da117ba8091f8fd7b45a99a30bec47b6b2fec487a6c1f45770633632da"
+bottom_deb_sha256: "e8312526746c1190c3433e6ce0843f64c6e0c501003ee377552745c040dc6d56"

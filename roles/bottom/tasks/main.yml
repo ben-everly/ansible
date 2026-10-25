@@ -19,9 +19,10 @@
         state: directory
       register: tmp_dir
 
+    # -1 is the deb revision; release tags don't carry it.
     - name: Download bottom deb
       get_url:
-        url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom_{{ bottom_version }}_amd64.deb"
+        url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom_{{ bottom_version }}-1_amd64.deb"
         dest: "{{ tmp_dir.path }}/bottom.deb"
         checksum: "sha256:{{ bottom_deb_sha256 }}"
 
