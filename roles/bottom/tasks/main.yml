@@ -38,6 +38,25 @@
       apt:
         deb: "{{ tmp_dir.path }}/bottom.deb"
         allow_downgrade: true
+
+    - name: Read back the installed bottom version
+      command:
+        cmd: /usr/bin/btm --version
+      changed_when: false
+      register: bottom_post_install
+
+    # Not inline in the assert: the conditional parser mangles '\1'.
+    - name: Determine the version the deb produced
+      set_fact:
+        bottom_reported_version: >-
+          {{ bottom_post_install.stdout | regex_search('^bottom\s+(\S+)', '\1') | default([''], true) | first }}
+
+    - name: Confirm the deb installed the pinned version
+      assert:
+        that: bottom_reported_version == bottom_version
+        fail_msg: >-
+          bottom reports version '{{ bottom_reported_version }}' after install,
+          expected '{{ bottom_version }}'
   always:
     - name: Remove tmp dir
       file:
