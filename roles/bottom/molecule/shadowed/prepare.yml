@@ -1,0 +1,14 @@
+---
+# A btm earlier on PATH at another version (cargo, asdf) is not the role's to
+# manage; the role must still converge on the deb and leave the shadow alone.
+- name: Prepare
+  hosts: all
+  tasks:
+    - name: Plant a shadowing btm
+      become: true
+      copy:
+        dest: /usr/local/bin/btm
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          echo bottom 0.9.0

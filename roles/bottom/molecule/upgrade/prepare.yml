@@ -1,0 +1,8 @@
+---
+- name: Prepare
+  hosts: all
+  vars:
+    bottom_version: "0.14.8"
+    bottom_deb_sha256: "c5c454894176ec6943df523b2a81e21188dd3a3e7076fdaf4d61fdfe6264d635"
+  roles:
+    - role: "{{ playbook_dir }}/../.."

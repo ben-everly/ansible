@@ -1,23 +1,65 @@
-- name: Check if bottom is installed
-  shell:
-    cmd: which btm
+---
+- name: Assert bottom supports this architecture
+  assert:
+    that: ansible_architecture == "x86_64"
+    fail_msg: "bottom role only supports x86_64 (got {{ ansible_architecture }})"
+
+# Bare `btm` on PATH can resolve to a cargo or asdf install this role doesn't manage.
+- name: Check installed bottom version
+  command:
+    cmd: /usr/bin/btm --version
   changed_when: false
-  failed_when: result.rc != 0 and result.rc != 1
-  register: result
+  failed_when: false
+  check_mode: no
+  register: bottom_installed
+
+- name: Determine the installed bottom version
+  set_fact:
+    bottom_installed_version: >-
+      {{ bottom_installed.stdout | regex_search('^bottom\s+(\S+)', '\1') | default([''], true) | first }}
 
 - name: Install bottom
-  when: result.rc == 1
+  when: bottom_installed_version != bottom_version
   block:
     - name: Make temp dir
       tempfile:
         state: directory
       register: tmp_dir
 
-    - name: Download bottom
+    # -1 is the deb revision; release tags don't carry it.
+    - name: Download bottom deb
       get_url:
-        url: https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
+        url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom_{{ bottom_version }}-1_amd64.deb"
         dest: "{{ tmp_dir.path }}/bottom.deb"
+        checksum: "sha256:{{ bottom_deb_sha256 }}"
 
     - name: Install bottom
       become: true
-      apt: 'deb="{{ tmp_dir.path }}/bottom.deb"'
+      apt:
+        deb: "{{ tmp_dir.path }}/bottom.deb"
+        allow_downgrade: true
+
+    - name: Read back the installed bottom version
+      command:
+        cmd: /usr/bin/btm --version
+      changed_when: false
+      register: bottom_post_install
+
+    # Not inline in the assert: the conditional parser mangles '\1'.
+    - name: Determine the version the deb produced
+      set_fact:
+        bottom_reported_version: >-
+          {{ bottom_post_install.stdout | regex_search('^bottom\s+(\S+)', '\1') | default([''], true) | first }}
+
+    - name: Confirm the deb installed the pinned version
+      assert:
+        that: bottom_reported_version == bottom_version
+        fail_msg: >-
+          bottom reports version '{{ bottom_reported_version }}' after install,
+          expected '{{ bottom_version }}'
+  always:
+    - name: Remove tmp dir
+      file:
+        path: "{{ tmp_dir.path }}"
+        state: absent
+      when: tmp_dir.path is defined
